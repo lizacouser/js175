@@ -8,8 +8,27 @@ P:
 */
 
 const HTTP = require('http');
+
+// imports URL constructor from node module URL
+const URL = require('url').URL;
+
 const PORT = 3000;
-const NUM_SIDES_DICE = 6;
+
+function rollDice(params) {
+  let numRolls = params.get('rolls') || 1;
+  let numSides = params.get('sides') || 6;
+
+  let result = "You rolled:\n"
+  for (let count = 0; count < numRolls; count += 1) {
+    result += `${Math.floor(Math.random() * numSides + 1)}\n`;
+  }
+  return result;
+}
+
+function getParams(path) {
+  const myURL = new URL(path, `http://localhost:${PORT}`);
+  return myURL.searchParams;
+};
 
 const SERVER = HTTP.createServer((req, res) => {
   let method = req.method;
@@ -18,12 +37,13 @@ const SERVER = HTTP.createServer((req, res) => {
   if (path === '/favicon.ico') {
     res.statusCode = 404;
     res.end();
+
   } else {
-    let randomNumber = Math.floor(Math.random() * NUM_SIDES_DICE + 1);
+    let params = getParams(path);
 
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/plain');
-    res.write(`You rolled a ${randomNumber}\n`);
+    res.write(rollDice(params));
     res.write(`${method} ${path}\n`);
     res.end();
   }
