@@ -3,7 +3,8 @@ P:
 -APR set to 5%
 -loan amount and loan duration (in years) passed in a query params
 -formula for monthly payment is:
-let monthlyPayment = loanAmount * (monthlyInterest / (1 - Math.pow((1 + monthlyInterest), (-loanDurationMonths))));
+let monthlyPayment = loanAmount * (monthlyInterest / (1 -
+  Math.pow((1 + monthlyInterest), (-loanDurationMonths))));
 -returns:
 Amount: $5000
 Duration: 10 years
@@ -43,15 +44,9 @@ A:
 const HTTP = require('http');
 const URL = require('url').URL;
 const PORT = 3000;
+const HANDLEBARS = require('handlebars');
 
-const APR = 0.05;
-const DEFAULT_AMOUNT = 5000;
-const DEFAULT_DURATION = 10;
-const AMOUNT_INTERVAL = 1000;
-const DURATION_INTERVAL = 5;
-
-
-const HTML_START = `
+const SOURCE = `
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -89,71 +84,90 @@ const HTML_START = `
     <article>
       <h1>Loan Calculator</h1>
       <table>
-        <tbody>`;
-
-const HTML_END = `
-        </tbody>
-      </table>
-    </article>
+        <tbody>
+        <tr>
+          <th>Amount:</th>
+          <td>
+            <a href='/?amount={{amountDecrement}}&duration={{durationInYears}}'>- $ {{amountInterval}}</a>
+          </td>
+          <td>$ {{loanAmount}}</td>
+          <td>
+          <a href='/?amount={{amountIncrement}}&duration={{durationInYears}}'>+ $ {{amountInterval}}</a>
+          </td>
+        </tr>
+        <tr>
+          <th>Duration:</th>
+          <td>
+            <a href='/?amount={{loanAmount}}&duration={{durationDecrement}}'>- {{durationInterval}} year</a> 
+          </td>
+          <td>{{durationInYears}} years</td>
+          <td>
+            <a href='/?amount={{loanAmount}}&duration={{durationIncrement}}'>+ {{durationInterval}} year</a> 
+          </td>
+        </tr>
+        <tr>
+          <th>APR:</th>
+          <td colspan='3'>{{apr}}%</td>
+        </tr>
+        <tr>
+          <th>Monthly payment:</th>
+          <td colspan='3'>$ {{monthlyPayment}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </article>
   </body>
-</html>`;
+</html>
+`;
 
-function yearOrYears(num) {
-  return Math.abs(num) === 1 ? `${num} year` : `${num} years`;
+const LOAN_DATA_TEMPLATE = HANDLEBARS.compile(SOURCE);
+
+function render(template, data) {
+  let html = template(data);
+  return html;
 }
 
 function getParams(path) {
   const myURL = new URL(path, `http://localhost:${PORT}`);
   return myURL.searchParams;
-};
-
-function calculateMonthlyPayment(loanAmount, durationInYears) {
-  let durationInMonths = durationInYears * 12;
-  let monthlyInterest = APR/12;
-
-  return loanAmount * (monthlyInterest / (1 - Math.pow((1 + monthlyInterest), (-durationInMonths))))
 }
 
-function getLoanData(params) {
-  let loanAmount = Number(params.get('amount')) || DEFAULT_AMOUNT;
-  let durationInYears = Number(params.get('duration')) || DEFAULT_DURATION;
-  let monthlyPayment = calculateMonthlyPayment(loanAmount, durationInYears);
+function calculateMonthlyPay(loanAmount, durationInYears, APR) {
+  let durationInMonths = durationInYears * 12;
+  let monthlyInterest = (APR / 100) / 12;
 
-  let content = `
-    <tr>
-      <th>Amount:</th>
-      <td>
-        <a href='/?amount=${loanAmount - AMOUNT_INTERVAL}&duration=${durationInYears}'>- $${AMOUNT_INTERVAL}</a>
-      </td>
-      <td>$${loanAmount}</td>
-      <td>
-      <a href='/?amount=${loanAmount + AMOUNT_INTERVAL}&duration=${durationInYears}'>+ $${AMOUNT_INTERVAL}</a>
-      </td>
-    </tr>
-    <tr>
-      <th>Duration:</th>
-      <td>
-        <a href='/?amount=${loanAmount}&duration=${durationInYears - DURATION_INTERVAL}'>- ${yearOrYears(DURATION_INTERVAL)}</a> 
-      </td>
-      <td>${durationInYears} years</td>
-      <td>
-        <a href='/?amount=${loanAmount}&duration=${durationInYears + DURATION_INTERVAL}'>+ ${yearOrYears(DURATION_INTERVAL)}</a> 
-      </td>
-    </tr>
-    <tr>
-      <th>APR:</th>
-      <td colspan='3'>${APR * 100}%</td>
-    </tr>
-    <tr>
-      <th>Monthly payment:</th>
-      <td colspan='3'>$${monthlyPayment.toFixed(2)}</td>
-    </tr>`;
+  let payment = loanAmount * (monthlyInterest / (1 - Math.pow((1 +
+    monthlyInterest), (-durationInMonths))));
 
-  return `${HTML_START}${content}${HTML_END}`;
+  return payment.toFixed(2);
+}
+
+function createLoanObject(params) {
+  let data = {};
+  const APR = 5;
+  const [DEFAULT_AMOUNT, DEFAULT_DURATION] = [5000, 10];
+  const [AMOUNT_INTERVAL, DURATION_INTERVAL] = [100, 1];
+
+  data.loanAmount = Number(params.get('amount')) || DEFAULT_AMOUNT;
+  data.amountInterval = AMOUNT_INTERVAL;
+  data.amountIncrement = data.loanAmount + AMOUNT_INTERVAL;
+  data.amountDecrement = data.loanAmount - AMOUNT_INTERVAL;
+
+  data.durationInYears = Number(params.get('duration')) || DEFAULT_DURATION;
+  data.durationInterval = DURATION_INTERVAL;
+  data.durationIncrement = data.durationInYears + DURATION_INTERVAL;
+  data.durationDecrement = data.durationInYears - DURATION_INTERVAL;
+
+  data.apr = APR;
+
+  data.monthlyPayment = calculateMonthlyPay(data.loanAmount,
+    data.durationInYears, APR);
+
+  return data;
 }
 
 const SERVER = HTTP.createServer((req, res) => {
-  let method = req.method;
+  // let method = req.method;
   let path = req.url;
 
   if (path === '/favicon.ico') {
@@ -161,16 +175,17 @@ const SERVER = HTTP.createServer((req, res) => {
     res.end();
 
   } else {
-    let params = getParams(path);
+    let data = createLoanObject(getParams(path));
+    let content = render(LOAN_DATA_TEMPLATE, data);
 
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/html');
-    res.write(getLoanData(params));
+    res.write(`${content}\n`);
     res.end();
   }
 });
 
-// listens 
+// listens
 SERVER.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}...`);
 });
