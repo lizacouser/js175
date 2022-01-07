@@ -1,0 +1,9 @@
+extends layout.pug
+
+block appContent
+  h1 Account
+  h2 You have #{money} in your account.
+  if !recentTransaction
+    p No recent transcations
+  else
+    p You have a recent transaction
