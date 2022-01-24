@@ -100,7 +100,7 @@ form dd {
 
 form input[type="text"],
 form input[type="password"] {
-  border: 1px solid #a4a4a4;
+  border: 1px soid #a4a4a4;
   border-radius: 8px;
   box-sizing: border-box;
   font: normal 20px "PT Sans", Helvetica, Arial, sans-serif;

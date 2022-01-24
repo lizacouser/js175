@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx nodemon todos.js"
+    "start": "npx nodemon todos.js",
+    "debug": "npx nodemon --inspect todos.js"
   },
   "author": "",
   "license": "ISC",
