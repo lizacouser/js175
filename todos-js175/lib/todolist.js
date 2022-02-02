@@ -8,6 +8,17 @@ class TodoList {
     this.todos = [];
   }
 
+  static makeTodoList(rawTodoListData) {
+    let todoList = Object.assign(new TodoList(), {
+      id: rawTodoListData.id,
+      title: rawTodoListData.title,
+    });
+
+    rawTodoListData.todos.forEach(todo => todoList.add(Todo.makeTodo(todo)));
+    return todoList;
+
+  }
+
   add(todo) {
     if (!(todo instanceof Todo)) {
       throw new TypeError("can only add Todo objects");

@@ -7,6 +7,10 @@ class Todo {
     this.done = false;
   }
 
+  static makeTodo(rawTodoData) {
+    return Object.assign(new Todo(), rawTodoData);
+  }
+
   toString() {
     let marker = this.isDone() ? Todo.DONE_MARKER : Todo.UNDONE_MARKER;
     return `[${marker}] ${this.title}`;
