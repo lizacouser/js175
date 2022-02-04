@@ -1,0 +1,27 @@
+extends layout
+
+
+block main
+  form(action="/new" method="post")
+    dl
+      dt
+        label(for="gameTitle") Enter the title for your new game:
+      dd
+        input(type="text"
+              id="gameTitle"
+              name="gameTitle"
+              placeholder="Game Title"
+              value=gameTitle)
+
+      dt
+        label(for="playerBetSize") How much money do you want to bet:
+      dd
+        input(type="number"
+              id="playerBetSize"
+              name="playerBetSize"
+              placeholder="1"
+              value=playerBetSize)
+
+    fieldset.actions
+      input(type="submit" value="Save")
+      a(href="/") Cancel
