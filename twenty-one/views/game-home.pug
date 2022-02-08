@@ -13,7 +13,7 @@ block main
     p You're rich!
 
   if !game.player.isBroke()
-    form(action=`/${game.id}` method="post")
+    form(action=`/${game.id}/bet` method="post")
       fieldset.actions
         button Make a bet
         a(href="/") Leave Game

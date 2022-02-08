@@ -69,11 +69,8 @@ class TwentyOneGame {
     });
   }
 
-  displayStartingHands() {
-    this.player.displayFullHand();
-    this.dealer.displayHiddenHand();
-
-    console.log(`Your total is ${this.player.getHandSum()}`);
+  displayHandTotal() {
+    return `Your total is ${this.player.getHandSum()}`;
   }
 
   displayFullHands() {
@@ -223,8 +220,9 @@ class TwentyOneGame {
       player: Player.makePlayer(rawGame.player),
       dealer: Dealer.makeDealer(rawGame.dealer),
       deck: Deck.makeDeck(rawGame.deck),
-      participants: [this.player, this.dealer],
     });
+
+    game.participants = [game.player, game.dealer];
 
     return game;
   }

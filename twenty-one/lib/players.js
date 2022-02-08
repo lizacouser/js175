@@ -51,11 +51,16 @@ class Participant {
   }
 
   displayFullHand() {
-    console.log(`${this.name}:`);
+    let cards = [];
     this.hand.forEach(card => {
-      console.log(card.getTitle());
+      cards.push(card.getTitle());
     });
-    console.log("");
+
+    let fullHand = "";
+    fullHand += `${this.name}: `;
+    fullHand += cards.join(', ');
+
+    return fullHand;
   }
 }
 
@@ -106,9 +111,8 @@ class Player extends Participant {
       name: rawPlayer.name,
       winnings: rawPlayer.winnings,
       betSize: rawPlayer.betSize,
+      hand: rawPlayer.hand,
     });
-
-    player.clearHand();
 
     return player;
   }
@@ -128,20 +132,23 @@ class Dealer extends Participant {
   }
 
   displayHiddenHand() {
-    console.log("Dealer:");
+    let hiddenHand = ""
+    hiddenHand += "Dealer: ";
+
     let visibleCard = this.hand[0];
-    console.log(visibleCard.getTitle());
-    console.log("and unknown card");
-    console.log("");
+
+    hiddenHand += visibleCard.getTitle() + " ";
+    hiddenHand += "and unknown card";
+
+    return hiddenHand;
   }
 
   static makeDealer(rawDealer) {
     let dealer = Object.assign(new Dealer(), {
       name: rawDealer.name,
       hitThreshold: rawDealer.hitThreshold,
+      hand: rawDealer.hand,
     });
-
-    dealer.clearHand();
 
     return dealer;
   }

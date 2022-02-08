@@ -1,0 +1,40 @@
+extends layout
+
+
+
+block main
+  h1 Your turn!
+  p #{game.player.logBetSize()}
+
+  p &nbsp
+  p #{game.player.displayFullHand()}
+  p &nbsp
+  p #{game.dealer.displayHiddenHand()}
+  p &nbsp
+  h4 #{game.displayHandTotal()}
+
+
+  form(action=`/${game.id}/hit` method="post")
+    fieldset.actions
+      button Hit
+      button(formaction=`/${game.id}/stay`) Stay
+
+//-   if game.player.isBroke()
+//-     p You're broke! No more betting for you.
+//-     p Start a new game to play again.
+
+//-   else if game.player.isRich()
+//-     p You're rich!
+
+
+
+block headerLinks
+  .actions
+    a(href=`/${game.id}`) Back to Game Home
+
+//- // choose button whether to hit or stay
+//- // if hit, refresh and log new cards
+//- // if stay, check if busted 
+//- // if busted redirect to /end-game
+//- // if not busted, go to dealer move
+

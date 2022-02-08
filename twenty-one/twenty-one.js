@@ -55,6 +55,7 @@ app.use((req, res, next) => {
 });
 
 const loadGame = (gameID, games) => {
+  // console.log(games.find(game => game.id === gameID).participants[0].hand)
   return games.find(game => game.id === gameID);
 };
 
@@ -96,11 +97,47 @@ app.post("/:gameID/destroy", (req, res) => {
 app.post('/new', (req, res) => {
   let title = req.body.gameTitle;
   let playerBetSize = req.body.playerBetSize;
-  console.log("my bet zie", playerBetSize);
   let playerStartingDollars = 10;
   req.session.games.push(new TwentyOneGame(title, playerBetSize, playerStartingDollars));
 
   res.redirect('/');
+})
+
+app.post(`/:gameID/bet`, (req, res) => {
+  let gameID = req.params.gameID;
+  let currentGame = loadGame(+gameID, req.session.games);
+  
+  currentGame.deck.reset();
+  currentGame.dealStartingHands();
+
+  res.render('player-move', {
+    game: currentGame,
+  })
+})
+
+
+app.post(`/:gameID/hit`, (req, res) => {
+  let gameID = req.params.gameID;
+  let currentGame = loadGame(+gameID, req.session.games);
+
+  currentGame.hit(currentGame.player);
+
+  if (currentGame.player.isBusted()) {
+    res.render("end-game");
+  }
+
+  res.render('player-move', {
+    game: currentGame,
+  })
+})
+
+app.post(`/:gameID/stay`, (req, res) => {
+  let gameID = req.params.gameID;
+  let currentGame = loadGame(+gameID, req.session.games);
+
+  res.render('dealer-move', {
+    game: currentGame,
+  })
 })
 
 // // Error handler
