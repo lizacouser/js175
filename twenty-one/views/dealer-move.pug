@@ -1,0 +1,22 @@
+extends layout
+
+block main
+  h1 Dealer's turn!
+  p &nbsp
+
+  for move in moves
+    p #{move}
+
+  p &nbsp
+  p #{game.player.displayFullHand()}
+  p &nbsp
+  p #{game.dealer.displayFullHand()}
+
+
+  form(action=`/${game.id}/results` method="post")
+    fieldset.actions
+      button See results
+
+block headerLinks
+  .actions
+    a(href=`/${game.id}`) Back to Game Home

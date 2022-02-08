@@ -47,13 +47,13 @@ class Participant {
   }
 
   logMove(move) {
-    console.log(`${this.name} ${move}!`);
+    return(`${this.name} ${move}`);
   }
 
   displayFullHand() {
     let cards = [];
     this.hand.forEach(card => {
-      cards.push(card.getTitle());
+      cards.push(`${card.getTitle()} (${card.getValue()})`);
     });
 
     let fullHand = "";

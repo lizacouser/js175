@@ -73,6 +73,10 @@ class TwentyOneGame {
     return `Your total is ${this.player.getHandSum()}`;
   }
 
+  clearHands() {
+    this.participants.forEach(participant => participant.clearHand());
+  }
+
   displayFullHands() {
     this.participants.forEach(participant => participant.displayFullHand());
 
@@ -179,17 +183,19 @@ class TwentyOneGame {
   displayResults() {
     let playerTotal = this.player.getHandSum();
     let dealerTotal = this.dealer.getHandSum();
+    let results;
 
     if (this.player.isBusted()) {
-      console.log("You busted! DEALER WINS :(");
+      results = "You busted! DEALER WINS :(";
     } else if (this.dealer.isBusted()) {
-      console.log("Dealer busted! YOU WIN :)");
+      results = "Dealer busted! YOU WIN :)";
     } else if (playerTotal === dealerTotal) {
-      console.log("It's an exact tie! Wow!");
+      results = "It's an exact tie! Wow!";
     } else {
-      console.log(dealerTotal < playerTotal ? "You win!" : "Dealer Wins!");
+      results = dealerTotal < playerTotal ? "You win!" : "Dealer Wins!";
     }
-    console.log("");
+
+    return results;
   }
 
 

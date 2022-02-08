@@ -72,9 +72,10 @@ app.get('/new', (req, res) => {
 
 app.get('/:gameID', (req, res) => {
   let gameID = req.params.gameID;
+  let currentGame = loadGame(+gameID, req.session.games);
 
   res.render('game-home', {
-    game: loadGame(+gameID, req.session.games),
+    game: currentGame,
   });
 })
 
@@ -123,7 +124,7 @@ app.post(`/:gameID/hit`, (req, res) => {
   currentGame.hit(currentGame.player);
 
   if (currentGame.player.isBusted()) {
-    res.render("end-game");
+    res.redirect(`/${gameID}`);
   }
 
   res.render('player-move', {
@@ -134,10 +135,29 @@ app.post(`/:gameID/hit`, (req, res) => {
 app.post(`/:gameID/stay`, (req, res) => {
   let gameID = req.params.gameID;
   let currentGame = loadGame(+gameID, req.session.games);
+  let moves = [];
+
+  while (currentGame.dealerUnderThreshold()) {
+    currentGame.hit(currentGame.dealer);
+    moves.push("Dealer hits!");
+  }
+
+  if (currentGame.dealer.isBusted()) {
+    moves.push("DEALER BUSTED!");
+  } else {
+    moves.push("Dealer stays.")
+  }
 
   res.render('dealer-move', {
     game: currentGame,
+    moves,
   })
+})
+
+app.post(`/:gameID/results`, (req, res) => {
+  let gameID = req.params.gameID;
+
+  res.redirect(`/${gameID}`);
 })
 
 // // Error handler

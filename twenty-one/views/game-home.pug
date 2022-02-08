@@ -2,15 +2,25 @@ extends layout
 
 block main
   h1 Welcome to #{game.title}
+  h1 Results:
+  p &nbsp
+  p #{game.player.displayFullHand()}
+  p #{game.dealer.displayFullHand()}
+  p &nbsp
+  h1 #{game.displayResults()}
+  
+  p &nbsp
   p #{game.player.logWinnings()}
   p #{game.player.logBetSize()}
+  p &nbsp
+
 
   if game.player.isBroke()
-    p You're broke! No more betting for you.
+    h1 You're broke! No more betting for you.
     p Start a new game to play again.
 
   else if game.player.isRich()
-    p You're rich!
+    h1 You're rich!
 
   if !game.player.isBroke()
     form(action=`/${game.id}/bet` method="post")
