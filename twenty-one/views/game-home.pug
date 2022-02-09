@@ -2,12 +2,7 @@ extends layout
 
 block main
   h1 Welcome to #{game.title}
-  h1 Results:
-  p &nbsp
-  p #{game.player.displayFullHand()}
-  p #{game.dealer.displayFullHand()}
-  p &nbsp
-  h1 #{game.displayResults()}
+  block results
   
   p &nbsp
   p #{game.player.logWinnings()}
@@ -16,11 +11,12 @@ block main
 
 
   if game.player.isBroke()
-    h1 You're broke! No more betting for you.
-    p Start a new game to play again.
+    p <em> You're broke! No more betting for you. </em>
+    .actions
+      a.add(href="/new") <b> Start a new game </b> to play again
 
   else if game.player.isRich()
-    h1 You're rich!
+    p <em> You're rich! Don't spend it all in one place. </em>
 
   if !game.player.isBroke()
     form(action=`/${game.id}/bet` method="post")

@@ -99,7 +99,7 @@ app.post('/new', (req, res) => {
   let title = req.body.gameTitle;
   let playerBetSize = req.body.playerBetSize;
   let playerStartingDollars = 10;
-  req.session.games.push(new TwentyOneGame(title, playerBetSize, playerStartingDollars));
+  req.session.games.push(new TwentyOneGame(title, +playerBetSize, +playerStartingDollars));
 
   res.redirect('/');
 })
@@ -124,7 +124,7 @@ app.post(`/:gameID/hit`, (req, res) => {
   currentGame.hit(currentGame.player);
 
   if (currentGame.player.isBusted()) {
-    res.redirect(`/${gameID}`);
+    res.redirect(`/${gameID}/results`);
   }
 
   res.render('player-move', {
@@ -154,10 +154,15 @@ app.post(`/:gameID/stay`, (req, res) => {
   })
 })
 
-app.post(`/:gameID/results`, (req, res) => {
+app.get(`/:gameID/results`, (req, res) => {
   let gameID = req.params.gameID;
+  currentGame = loadGame(+gameID, req.session.games);
 
-  res.redirect(`/${gameID}`);
+  currentGame.claimWinnings();
+
+  res.render('results', {
+    game: currentGame,
+  });
 })
 
 // // Error handler

@@ -1,20 +1,9 @@
-extends layout
+extends game-home
 
-block main
-  h1 Results
+block results
+  h1 Results:
   p &nbsp
   p #{game.player.displayFullHand()}
-  p &nbsp
   p #{game.dealer.displayFullHand()}
   p &nbsp
   h1 #{game.displayResults()}
-
-  //- if !game.player.isBroke()
-  //-   form(action=`/${game.id}/bet` method="post")
-  //-     fieldset.actions
-  //-       button Make a bet
-  //-       a(href="/") Leave Game
-
-block headerLinks
-  .actions
-    a(href="/") Back to Games
