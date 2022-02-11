@@ -13,8 +13,6 @@ block main
       ul
         each game in games
           li(class=game.player.isBroke()? "broke": "rich")
-            //- if game.player.isBroke()
-            //-   img(src="../images/icon_broke.png" height=28 width=28) 
             a(href=`/${game.id}`)
               h2= game.title
               

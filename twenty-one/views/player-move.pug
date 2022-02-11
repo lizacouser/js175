@@ -2,6 +2,7 @@ extends layout
 
 block main
   h1 Your turn!
+  p #{game.player.logWinnings()}
   p #{game.player.logBetSize()}
 
   p &nbsp
@@ -19,7 +20,7 @@ block main
 
 block headerLinks
   .actions
-    a(href=`/${game.id}`) Back to Game Home
+    a(href=`/${game.id}`) "#{game.title}" Home
 
 //- // choose button whether to hit or stay
 //- // if hit, refresh and log new cards

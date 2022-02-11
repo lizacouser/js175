@@ -79,7 +79,11 @@ class Player extends Participant {
   }
 
   logBetSize() {
-    return `You're betting $${this.getBetSize()} each turn`;
+    return `You're betting $${this.getBetSize()}`;
+  }
+
+  setBetSize(betSize) {
+    this.betSize = betSize;
   }
 
   getWinnings() {
@@ -103,7 +107,7 @@ class Player extends Participant {
   }
 
   logWinnings() {
-    return `You have $${this.winnings}.`;
+    return `You have $${this.winnings} to bet.`;
   }
 
   static makePlayer(rawPlayer) {

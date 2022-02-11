@@ -6,6 +6,7 @@ const { body, validationResult } = require("express-validator");
 const TwentyOneGame = require('./lib/game');
 const sortGames = require('./lib/sortGames');
 const store = require("connect-loki");
+const req = require('express/lib/request');
 
 const app = express();
 const host = "localhost";
@@ -121,12 +122,12 @@ app.post('/new',
   ],
 
   [
-    body("playerBetSize")
+    body("playerStartingAmount")
       .notEmpty()
-      .withMessage("The bet size is required.")
+      .withMessage("The starting amount is required.")
       .bail()
-      .isInt({ min: 1, max: 10 })
-      .withMessage("Bet must be between 1 and 10.")
+      .isInt({ min: 1, max: 100 })
+      .withMessage(`Starting amount must be between 1 and 100.`)
   ],
 
   (req, res) => {
@@ -136,14 +137,16 @@ app.post('/new',
       res.render("new-game", {
         flash: req.flash(),
         gameTitle: req.body.gameTitle,
-        playerBetSize: req.body.playerBetSize,
+        playerStartingAmount: req.body.playerStartingAmount,
       })
     } else {
       let title = req.body.gameTitle;
-      let playerBetSize = req.body.playerBetSize;
-      let playerStartingDollars = 10;
+      let playerStartingDollars = Number(req.body.playerStartingAmount);
+      let defaultBetSize = 1; 
 
-      req.session.games.push(new TwentyOneGame(title, +playerBetSize, +playerStartingDollars));
+      req.session.bank= req.session.bank - playerStartingDollars;
+
+      req.session.games.push(new TwentyOneGame(title, defaultBetSize, playerStartingDollars));
       req.flash("success", "The game has been created.");
 
       res.redirect('/');
@@ -158,14 +161,49 @@ app.post(`/:gameID/bet`, (req, res, next) => {
   if (currentGame === undefined) {
     next(new Error("Not found."));
   } else {
-    currentGame.deck.reset();
-    currentGame.dealStartingHands();
-
-    res.render('player-move', {
+    res.render('bet', {
       game: currentGame,
     })
   }
 })
+
+app.post(`/:gameID/play`, 
+  [
+    body("playerBetSize")
+      .notEmpty()
+      .withMessage("The bet size is required.")
+      .bail()
+      .isInt({ min: 1, max: 10 })
+      .withMessage(`Bet must be between 1 and 10.`)
+  ],
+
+  (req, res, next) => {
+    let gameID = req.params.gameID;
+    let currentGame = loadGame(+gameID, req.session.games);
+
+    if (currentGame === undefined) {
+      next(new Error("Not found."));
+    } else {
+      let errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        errors.array().forEach(message => req.flash("error", message.msg));
+        res.render("bet", {
+          flash: req.flash(),
+          playerBetSize: req.body.playerBetSize,
+          game: currentGame,
+        })
+      } else {
+        currentGame.player.setBetSize(+req.body.playerBetSize)
+        currentGame.deck.reset();
+        currentGame.dealStartingHands();
+  
+        res.render('player-move', {
+          game: currentGame,
+        })
+      }
+    }
+  }
+)
 
 
 app.post(`/:gameID/hit`, (req, res) => {

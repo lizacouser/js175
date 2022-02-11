@@ -1,7 +1,7 @@
 extends layout
 
 block main
-  h1 Welcome to #{game.title}
+  h1 Welcome to "#{game.title}"
   p 
     em Bank: #{bank}
   p &nbsp
@@ -17,17 +17,12 @@ block main
     .actions
       a.add(href="/new") <b> Start a new game </b> to play again
 
-  else if game.player.isRich()
-    p <em> You're rich! Don't spend it all in one place. </em>
-
   if !game.player.isBroke()
     form(action=`/${game.id}/bet` method="post")
       fieldset.actions
         button Make a bet
         a(href="/") Leave Game
-    p &nbsp
-    p #{game.player.logBetSize()}
 
 block headerLinks
   .actions
-    a(href="/") Back to Games
+    a(href="/") All Games
