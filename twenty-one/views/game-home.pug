@@ -2,12 +2,14 @@ extends layout
 
 block main
   h1 Welcome to #{game.title}
+  p 
+    em Bank: #{bank}
+  p &nbsp
+  
   block results
   
   p &nbsp
   p #{game.player.logWinnings()}
-  p #{game.player.logBetSize()}
-  p &nbsp
 
 
   if game.player.isBroke()
@@ -23,6 +25,8 @@ block main
       fieldset.actions
         button Make a bet
         a(href="/") Leave Game
+    p &nbsp
+    p #{game.player.logBetSize()}
 
 block headerLinks
   .actions

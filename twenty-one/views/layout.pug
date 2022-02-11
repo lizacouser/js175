@@ -12,8 +12,16 @@ html(lang="en-US")
 
   body
     header
-      h1 Twenty-One
+      a(href="/")
+        h1 Twenty-One
       block headerLinks 
 
     main
+      - let kinds = Object.keys(flash || {});
+      if kinds.length > 0
+        ul
+          each kind in kinds
+            each message in flash[kind]
+              li.flash(class=kind)= message
+
       block main

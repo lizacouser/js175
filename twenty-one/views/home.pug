@@ -3,17 +3,24 @@ extends layout.pug
 
 block main
   h2 Welcome to Twenty-One!
+  p 
+    em Bank: #{bank}
+  p &nbsp
   if games === undefined || games.length === 0
     p#no_list You don't have any games. Why not start one?
   else
-    ul#lists
-      each game in games
-        li
-          a(href=`/${game.id}`)
-            h2= game.title
-          // add line here about score slash money
-          form.delete(action=`/${game.id}/destroy` method="post")
-            button Delete
+    section#lists
+      ul
+        each game in games
+          li(class=game.player.isBroke()? "broke": "rich")
+            //- if game.player.isBroke()
+            //-   img(src="../images/icon_broke.png" height=28 width=28) 
+            a(href=`/${game.id}`)
+              h2= game.title
+              
+                //- add line here about score slash money
+            form.delete(action=`/${game.id}/destroy` method="post")
+              button Delete
 
 
 block headerLinks

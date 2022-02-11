@@ -13,7 +13,11 @@ const compareByTitle = (itemA, itemB) => {
 };
 
 const sortGames = (games) => {
-  return games.slice().sort(compareByTitle);
+  let inPlay = games.filter(game => !game.player.isBroke());
+  let broke = games.filter(game => game.player.isBroke());
+  inPlay.sort(compareByTitle);
+  broke.sort(compareByTitle);
+  return [].concat(inPlay, broke);
 }
 
 module.exports = sortGames;

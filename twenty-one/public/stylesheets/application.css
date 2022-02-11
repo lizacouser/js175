@@ -9,6 +9,10 @@ body {
   font: normal 20px "PT Sans", Helvetica, Arial, sans-serif;
 }
 
+body > h2 {
+  font-weight: bold;
+}
+
 body > header {
   margin: 0 auto;
   max-width: 1000px;
@@ -134,6 +138,12 @@ form input[type="submit"]:hover {
 
 form fieldset.actions a:hover {
   color: #b00b00;
+  cursor: pointer;
+}
+
+form fieldset.actions button:hover {
+  background-color: #f04f44;
+  cursor: pointer;
 }
 
 .flash {
@@ -164,6 +174,10 @@ form fieldset.actions a:hover {
   width: 95%;
 }
 
+#lists a:hover {
+  color: #dd5f4f;
+}
+
 #lists p {
   color: #666666;
   float: right;
@@ -180,7 +194,7 @@ form fieldset.actions a:hover {
   position: relative;
 }
 
-#todos > ul {
+#lists > ul {
   padding: 10px 0 50px;
 }
 
@@ -205,7 +219,7 @@ form fieldset.actions a:hover {
   z-index: 1;
 }
 
-#todos > ul li form {
+#lists > ul li form {
   position: absolute;
   top: 50%;
   z-index: 1;
@@ -241,7 +255,7 @@ form fieldset.actions a:hover {
   width: 28px;
 }
 
-#todos > ul li .delete button {
+#lists > ul li .delete button {
   background-color: transparent;
   border: none;
   color: transparent;
@@ -254,7 +268,7 @@ form fieldset.actions a:hover {
   border-color: #dd5f4f;
 }
 
-#todos > ul li .delete {
+#lists > ul li .delete {
   background: transparent url("../images/icon_delete.png") 0 3px no-repeat;
   height: 27px;
   margin: -12px 0 0;
@@ -263,20 +277,20 @@ form fieldset.actions a:hover {
   width: 24px;
 }
 
-#todos > ul li .delete:hover {
+#lists > ul li .delete:hover {
   opacity: 1;
 }
 
-#todos > ul li.done h3 {
+#todos > ul li.broke h3 {
   color: #bebebe;
   text-decoration: line-through;
 }
 
-#todos.done header .check {
+#todos.broke header .check {
   display: none;
 }
 
-#todos > ul li.done .check {
+#todos > ul li.broke .check {
   background: transparent url("../images/icon_check.png") 50% 50% no-repeat;
 }
 
@@ -299,11 +313,11 @@ form fieldset.actions a:hover {
 }
 
 #lists li::before {
-  background-color: #dd5f4f;
+  background-color: transparent;
   border-radius: 100%;
   content: "";
   height: 16px;
-  left: 23px;
+  left: 16px;
   margin: -8px 0 0;
   position: absolute;
   top: 50%;
@@ -311,21 +325,27 @@ form fieldset.actions a:hover {
   z-index: 1;
 }
 
-#lists li.done::before {
-  background: #ffffff url("../images/icon_check.png") 50% 50% no-repeat;
-  border: 1px solid #666666;
-  border-radius: 4px;
-  height: 28px;
+#lists li.broke::before {
+  content: url('../images/icon_broke.png');
+  transform: scale(0.2);
   margin: -15px 0 0 -7px;
-  width: 28px;
+  right: 20px;
+  opacity: 0.5;
 }
 
-#lists li.done h2 {
+#lists li.rich::before {
+  content: url('../images/icon_rich.png');
+  transform: scale(0.2);
+  margin: -15px 0 0 -7px;
+  right: 20px;
+}
+
+#lists li.broke h2 {
   color: #bebebe;
   text-decoration: line-through;
 }
 
-#lists li.done p {
+#lists li.broke p {
   color: #bebebe;
 }
 
@@ -430,7 +450,7 @@ form fieldset.actions a:hover {
   border: 2px solid transparent;
 }
 
-#todos.done header h2 {
+#todos.broke header h2 {
   color: #bebebe;
   text-decoration: line-through;
 }
