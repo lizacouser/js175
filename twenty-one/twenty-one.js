@@ -37,9 +37,6 @@ app.use(flash());
 
 // Set up persistent session data
 app.use((req, res, next) => {
-  let bank = 100;
-  req.session.bank = bank;
-
   let games = [];
   if ("games" in req.session) {
     req.session.games.forEach(game => {
@@ -67,7 +64,6 @@ const loadGame = (gameID, games) => {
 app.get('/', (req, res) => {
   res.render('home', {
     games: sortGames(req.session.games),
-    bank: req.session.bank,
   });
 })
 
@@ -84,7 +80,6 @@ app.get('/:gameID', (req, res, next) => {
   } else {
     res.render('game-home', {
       game: currentGame,
-      bank: req.session.bank,
     });
   }
 })
@@ -144,12 +139,12 @@ app.post('/new',
       let playerStartingDollars = Number(req.body.playerStartingAmount);
       let defaultBetSize = 1; 
 
-      req.session.bank= req.session.bank - playerStartingDollars;
+      let newGame = new TwentyOneGame(title, defaultBetSize, playerStartingDollars)
 
-      req.session.games.push(new TwentyOneGame(title, defaultBetSize, playerStartingDollars));
+      req.session.games.push(newGame);
       req.flash("success", "The game has been created.");
 
-      res.redirect('/');
+      res.redirect(`/${newGame.id}`);
     }
   }
 )
@@ -216,6 +211,7 @@ app.post(`/:gameID/hit`, (req, res) => {
     currentGame.hit(currentGame.player);
 
     if (currentGame.player.isBusted()) {
+      req.session.moves = [];
       res.redirect(`/${gameID}/results`);
     }
   
@@ -244,11 +240,10 @@ app.post(`/:gameID/stay`, (req, res) => {
     } else {
       moves.push("Dealer stays.")
     }
+
+    req.session.moves = moves;
   
-    res.render('dealer-move', {
-      game: currentGame,
-      moves,
-    })
+    res.redirect('results')
   }
 })
 
@@ -263,7 +258,7 @@ app.get(`/:gameID/results`, (req, res) => {
 
     res.render('results', {
       game: currentGame,
-      bank: req.session.bank,
+      moves: req.session.moves,
     });
   }
 })

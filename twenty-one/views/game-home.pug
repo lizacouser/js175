@@ -1,14 +1,11 @@
 extends layout
 
 block main
-  h1 Welcome to "#{game.title}"
-  p 
-    em Bank: #{bank}
+  h1 Game: "#{game.title}"
   p &nbsp
   
   block results
   
-  p &nbsp
   p #{game.player.logWinnings()}
 
 

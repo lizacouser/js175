@@ -10,7 +10,7 @@ block main
   p &nbsp
   p #{game.dealer.displayHiddenHand()}
   p &nbsp
-  h4 #{game.displayHandTotal()}
+  h4 #{game.player.displayHandTotal()}
 
 
   form(action=`/${game.id}/hit` method="post")

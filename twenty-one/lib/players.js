@@ -74,6 +74,10 @@ class Player extends Participant {
     this.betSize = betSize;
   }
 
+  displayHandTotal() {
+    return `Your total is ${this.getHandSum()}`;
+  }
+
   getBetSize() {
     return this.betSize;
   }
@@ -107,7 +111,7 @@ class Player extends Participant {
   }
 
   logWinnings() {
-    return `You have $${this.winnings} to bet.`;
+    return `You have $${this.winnings}`;
   }
 
   static makePlayer(rawPlayer) {
@@ -133,6 +137,10 @@ class Dealer extends Participant {
 
   getHitThreshold() {
     return this.hitThreshold;
+  }
+
+  displayHandTotal() {
+    return `Dealer total is ${this.getHandSum()}`;
   }
 
   displayHiddenHand() {

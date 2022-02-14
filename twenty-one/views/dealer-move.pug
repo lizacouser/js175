@@ -7,10 +7,10 @@ block main
   for move in moves
     p #{move}
 
-  p &nbsp
-  p #{game.player.displayFullHand()}
-  p &nbsp
-  p #{game.dealer.displayFullHand()}
+  //- p &nbsp
+  //- p #{game.player.displayFullHand()}
+  //- p &nbsp
+  //- p #{game.dealer.displayFullHand()}
 
 
   form(action=`/${game.id}/results` method="get")

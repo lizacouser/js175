@@ -10,8 +10,8 @@ block main
               id="playerBetSize"
               name="playerBetSize"
               placeholder="1"
-              value=playerBetSize)
+              value=playerBetSize || 1)
 
     fieldset.actions
-      input(type="submit" value="Save")
+      input(type="submit" value="Bet")
       a(href=`/${game.id}`) Cancel

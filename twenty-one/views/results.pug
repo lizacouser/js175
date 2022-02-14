@@ -1,9 +1,19 @@
 extends game-home
 
 block results
-  h1 Results:
+  h1 #{game.displayResults()}
   p &nbsp
+
+  if moves.length > 0
+    h1 Dealer's turn:
+    for move in moves
+      p #{move}
+    p &nbsp
+
+  h1 Results:
   p #{game.player.displayFullHand()}
   p #{game.dealer.displayFullHand()}
   p &nbsp
-  h1 #{game.displayResults()}
+  h4 #{game.player.displayHandTotal()}
+  h4 #{game.dealer.displayHandTotal()}
+  p &nbsp
