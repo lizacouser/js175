@@ -55,7 +55,6 @@ app.use((req, res, next) => {
 });
 
 const loadGame = (gameID, games) => {
-  // console.log(games.find(game => game.id === gameID).participants[0].hand)
   return games.find(game => game.id === gameID);
 };
 

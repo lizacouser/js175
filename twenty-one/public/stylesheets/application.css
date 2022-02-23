@@ -205,62 +205,17 @@ form fieldset.actions button:hover {
   padding: 10px 0 50px;
 }
 
-/* #todos > ul li {
-  border-bottom: 1px solid #d7d7d7;
-  margin: 0 0 25px 60px;
-  padding: 10px 0;
-  position: relative;
-} */
-
 #games a {
   color: inherit;
   display: block;
   overflow: hidden;
 }
 
-/* #todos > ul li a {
-  overflow: hidden;
-  position: absolute;
-  text-indent: -8685px;
-  top: 50%;
-  z-index: 1;
-} */
-
 #games > ul li form {
   position: absolute;
   top: 50%;
   z-index: 1;
 }
-/* 
-#todos > ul li .check {
-  height: 30px;
-  left: -45px;
-  margin: -15px 0 0;
-}
-
-#todos header ul button {
-  background-color: transparent;
-  border: none;
-  color: #3f3f3f;
-  cursor: pointer;
-  display: inline-block;
-  font: normal 20px "PT Sans", Helvetica, Arial, sans-serif;
-  padding: 0;
-
-  -moz-transition: color 200ms ease;
-  -o-transition: color 200ms ease;
-  -webkit-transition: color 200ms ease;
-}
-
-#todos > ul li .check button {
-  background-color: transparent;
-  border: 1px solid #666666;
-  border-radius: 4px;
-  color: transparent;
-  cursor: pointer;
-  height: 28px;
-  width: 28px;
-} */
 
 #games > ul li .delete button {
   background-color: transparent;
@@ -270,10 +225,6 @@ form fieldset.actions button:hover {
   height: 24px;
   width: 24px;
 }
-/* 
-#todos > ul li .check [type="submit"]:hover {
-  border-color: #dd5f4f;
-} */
 
 #games > ul li .delete {
   background: transparent url("../images/icon_delete.png") 0 3px no-repeat;
@@ -287,31 +238,6 @@ form fieldset.actions button:hover {
 #games > ul li .delete:hover {
   opacity: 1;
 }
-/* 
-#todos > ul li.broke h3 {
-  color: #bebebe;
-  text-decoration: line-through;
-}
-
-#todos.broke header .check {
-  display: none;
-}
-
-#todos > ul li.broke .check {
-  background: transparent url("../images/icon_check.png") 50% 50% no-repeat;
-}
-
-#todos header {
-  background-color: #f6f6f6;
-  border-radius: 6px;
-  padding: 15px 20px;
-}
-
-#todos header h2 {
-  display: inline-block;
-  vertical-align: middle;
-  width: 50%;
-} */
 
 #no_list {
   background: transparent url("../images/arrow_new_list.png") 85% 0 no-repeat;
@@ -368,97 +294,3 @@ form fieldset.actions button:hover {
     max-width: 100%;
   }
 }
-/* 
-@media screen and (max-width: 650px) {
-  #todos header h2 {
-    display: block;
-    padding: 0 0 15px;
-    width: auto;
-  }
-}
-
-#todos header ul {
-  display: inline-block;
-  text-align: right;
-  vertical-align: middle;
-  width: 49%;
-}
-
-@media screen and (max-width: 650px) {
-  #todos header ul {
-    display: block;
-    text-align: left;
-    width: auto;
-  }
-}
-
-#todos header ul li {
-  display: inline-block;
-  margin: 0 0 0 40px;
-}
-
-@media screen and (max-width: 650px) {
-  #todos header ul li {
-    margin: 0 40px 0 0;
-  }
-}
-
-#todos header ul a {
-  display: block;
-}
-
-#todos header ul a::before {
-  content: "";
-  display: inline-block;
-  height: 24px;
-  margin: 0 7px 0 0;
-  vertical-align: -6px;
-  width: 24px;
-}
-
-#todos header ul a.edit {
-  -moz-transition: background-color 200ms ease;
-  -o-transition: background-color 200ms ease;
-  -webkit-transition: background-color 200ms ease;
-}
-
-#todos header ul a.edit:hover {
-  color: #dd5f4f;
-}
-
-#todos header ul button.edit::before {
-  background: transparent url("../images/icon_edit.png") 0 0 no-repeat;
-  border: 2px solid transparent;
-}
-
-#todos header ul button::before {
-  content: "";
-  display: inline-block;
-  height: 24px;
-  margin: 0 7px 0 0;
-  vertical-align: -6px;
-  width: 24px;
-}
-
-#todos header ul button.check:hover {
-  color: #00b059;
-}
-
-#todos header ul button.check::before {
-  background: transparent url("../images/icon_check.png") 50% 50% no-repeat;
-  border: 2px solid #3f3f3f;
-}
-
-#todos header ul button.delete:hover {
-  color: #b00b00;
-}
-
-#todos header ul button.delete::before {
-  background: transparent url("../images/icon_delete.png") 0 0 no-repeat;
-  border: 2px solid transparent;
-}
-
-#todos.broke header h2 {
-  color: #bebebe;
-  text-decoration: line-through;
-} */
