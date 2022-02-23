@@ -1,0 +1,36 @@
+extends layout
+
+block main
+  form(action="/students" method="post")
+    dl
+      dt
+        label(for="studentName") Enter your student's name:
+      dd
+        input(type="text"
+              id="studentName"
+              name="studentName"
+              placeholder="Student Name"
+              value=studentName)
+
+      br
+      p Enter your student's baseline score:
+      dt
+        dd
+          label(for="studentBaselineVerbal") Verbal
+          input(type="number"
+                id="studentBaselineVerbal"
+                name="studentBaselineVerbal"
+                placeholder=500
+                value=studentBaselineVerbal || 500)
+
+        dd
+          label(for="studentBaselineMath") Math
+          input(type="number"
+                id="studentBaselineMath"
+                name="studentBaselineMath"
+                placeholder=500
+                value=studentBaselineMath || 500)
+
+    fieldset.actions
+      input(type="submit" value="Save")
+      a(href="/students") Cancel

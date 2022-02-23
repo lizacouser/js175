@@ -1,7 +1,7 @@
 // Compare object titles alphabetically (case insensitive)
 const compareByTitle = (itemA, itemB) => {
-  let titleA = itemA.title.toLowerCase();
-  let titleB = itemB.title.toLowerCase();
+  let titleA = itemA.name.toLowerCase();
+  let titleB = itemB.name.toLowerCase();
 
   if (titleA < titleB) {
     return -1;
@@ -13,22 +13,18 @@ const compareByTitle = (itemA, itemB) => {
 };
 
 module.exports = {
-  // return the list of todo lists sorted by completion status and title.
-  sortTodoLists(todoLists) {
-    let undone = todoLists.filter(todoList => !todoList.isDone());
-    let done = todoLists.filter(todoList => todoList.isDone());
-    undone.sort(compareByTitle);
-    done.sort(compareByTitle);
-    return [].concat(undone, done);
+  sortStudents(students) {
+    return students.filter(student => student.name).sort(compareByTitle);
+    // let undone = students.filter(student => !student.isDone());
+    // let done = students.filter(student => student.isDone());
+    // undone.sort(compareByTitle);
+    // done.sort(compareByTitle);
+    // return [].concat(undone, done);
   },
 
-  // return the list of todos in the todo list sorted by completion status and
-  // title.
-  sortTodos(todoList) {
-    let undone = todoList.todos.filter(todo => !todo.isDone());
-    let done = todoList.todos.filter(todo => todo.isDone());
-    undone.sort(compareByTitle);
-    done.sort(compareByTitle);
+  sortTests(tests) {
+    let done = tests.filter(test => test.isDone());
+    let undone = tests.filter(test => !test.isDone());
     return [].concat(undone, done);
-  },
+  }
 };

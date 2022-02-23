@@ -159,12 +159,12 @@ form fieldset.actions a:hover {
   color: #33cc99;
 }
 
-#lists h2 {
+#students h2 {
   float: left;
   width: 95%;
 }
 
-#lists p {
+#students p {
   color: #666666;
   float: right;
   font-size: 0.9rem;
@@ -172,7 +172,7 @@ form fieldset.actions a:hover {
   width: 5%;
 }
 
-#lists li {
+#students li {
   background-color: #f6f6f6;
   border-radius: 8px;
   margin: 0 0 10px;
@@ -180,24 +180,24 @@ form fieldset.actions a:hover {
   position: relative;
 }
 
-#todos > ul {
+#tests > ul {
   padding: 10px 0 50px;
 }
 
-#todos > ul li {
+#tests > ul li {
   border-bottom: 1px solid #d7d7d7;
   margin: 0 0 25px 60px;
   padding: 10px 0;
   position: relative;
 }
 
-#lists a {
+#students a {
   color: inherit;
   display: block;
   overflow: hidden;
 }
 
-#todos > ul li a {
+#tests > ul li a {
   overflow: hidden;
   position: absolute;
   text-indent: -8685px;
@@ -205,19 +205,19 @@ form fieldset.actions a:hover {
   z-index: 1;
 }
 
-#todos > ul li form {
+#tests > ul li form {
   position: absolute;
   top: 50%;
   z-index: 1;
 }
 
-#todos > ul li .check {
+#tests > ul li .check {
   height: 30px;
   left: -45px;
   margin: -15px 0 0;
 }
 
-#todos header ul button {
+#tests header ul button {
   background-color: transparent;
   border: none;
   color: #3f3f3f;
@@ -231,7 +231,7 @@ form fieldset.actions a:hover {
   -webkit-transition: color 200ms ease;
 }
 
-#todos > ul li .check button {
+#tests > ul li .check button {
   background-color: transparent;
   border: 1px solid #666666;
   border-radius: 4px;
@@ -241,52 +241,61 @@ form fieldset.actions a:hover {
   width: 28px;
 }
 
-#todos > ul li .delete button {
+#tests > ul li .score {
+  background: transparent;
+  margin: -27px 0 0;
+  opacity: 0.8;
+  font-size: 0.5em;
+  right: 20px;
+  width: 150px;
+}
+
+/* #tests > ul li .delete button {
   background-color: transparent;
   border: none;
   color: transparent;
   cursor: pointer;
   height: 24px;
   width: 24px;
-}
+} */
 
-#todos > ul li .check [type="submit"]:hover {
+#tests > ul li .check [type="submit"]:hover {
   border-color: #dd5f4f;
 }
 
-#todos > ul li .delete {
+/* #tests > ul li .delete {
   background: transparent url("../images/icon_delete.png") 0 3px no-repeat;
   height: 27px;
   margin: -12px 0 0;
   opacity: 0.4;
   right: 20px;
   width: 24px;
-}
+} */
 
-#todos > ul li .delete:hover {
+/* #tests > ul li .delete:hover {
   opacity: 1;
-}
+} */
 
-#todos > ul li.done h3 {
+#tests > ul li.done h3 {
   color: #bebebe;
   text-decoration: line-through;
 }
 
-#todos.done header .check {
+#tests.done header .check {
   display: none;
 }
 
-#todos > ul li.done .check {
+#tests > ul li.done .check {
   background: transparent url("../images/icon_check.png") 50% 50% no-repeat;
 }
 
-#todos header {
+#tests header {
   background-color: #f6f6f6;
   border-radius: 6px;
   padding: 15px 20px;
 }
 
-#todos header h2 {
+#tests header h2 {
   display: inline-block;
   vertical-align: middle;
   width: 50%;
@@ -298,7 +307,7 @@ form fieldset.actions a:hover {
   text-align: center;
 }
 
-#lists li::before {
+#students li::before {
   background-color: #dd5f4f;
   border-radius: 100%;
   content: "";
@@ -311,7 +320,7 @@ form fieldset.actions a:hover {
   z-index: 1;
 }
 
-#lists li.done::before {
+#students li.done::before {
   background: #ffffff url("../images/icon_check.png") 50% 50% no-repeat;
   border: 1px solid #666666;
   border-radius: 4px;
@@ -320,12 +329,12 @@ form fieldset.actions a:hover {
   width: 28px;
 }
 
-#lists li.done h2 {
+#students li.done h2 {
   color: #bebebe;
   text-decoration: line-through;
 }
 
-#lists li.done p {
+#students li.done p {
   color: #bebebe;
 }
 
@@ -342,14 +351,14 @@ form fieldset.actions a:hover {
 }
 
 @media screen and (max-width: 650px) {
-  #todos header h2 {
+  #tests header h2 {
     display: block;
     padding: 0 0 15px;
     width: auto;
   }
 }
 
-#todos header ul {
+#tests header ul {
   display: inline-block;
   text-align: right;
   vertical-align: middle;
@@ -357,29 +366,29 @@ form fieldset.actions a:hover {
 }
 
 @media screen and (max-width: 650px) {
-  #todos header ul {
+  #tests header ul {
     display: block;
     text-align: left;
     width: auto;
   }
 }
 
-#todos header ul li {
+#tests header ul li {
   display: inline-block;
   margin: 0 0 0 40px;
 }
 
 @media screen and (max-width: 650px) {
-  #todos header ul li {
+  #tests header ul li {
     margin: 0 40px 0 0;
   }
 }
 
-#todos header ul a {
+#tests header ul a {
   display: block;
 }
 
-#todos header ul a::before {
+#tests header ul a::before {
   content: "";
   display: inline-block;
   height: 24px;
@@ -388,22 +397,22 @@ form fieldset.actions a:hover {
   width: 24px;
 }
 
-#todos header ul a.edit {
+#tests header ul a.edit {
   -moz-transition: background-color 200ms ease;
   -o-transition: background-color 200ms ease;
   -webkit-transition: background-color 200ms ease;
 }
 
-#todos header ul a.edit:hover {
+#tests header ul a.edit:hover {
   color: #dd5f4f;
 }
 
-#todos header ul button.edit::before {
+#tests header ul button.edit::before {
   background: transparent url("../images/icon_edit.png") 0 0 no-repeat;
   border: 2px solid transparent;
 }
 
-#todos header ul button::before {
+#tests header ul button::before {
   content: "";
   display: inline-block;
   height: 24px;
@@ -412,25 +421,25 @@ form fieldset.actions a:hover {
   width: 24px;
 }
 
-#todos header ul button.check:hover {
+#tests header ul button.check:hover {
   color: #00b059;
 }
 
-#todos header ul button.check::before {
+#tests header ul button.check::before {
   background: transparent url("../images/icon_check.png") 50% 50% no-repeat;
   border: 2px solid #3f3f3f;
 }
 
-#todos header ul button.delete:hover {
+#tests header ul button.delete:hover {
   color: #b00b00;
 }
 
-#todos header ul button.delete::before {
+#tests header ul button.delete::before {
   background: transparent url("../images/icon_delete.png") 0 0 no-repeat;
   border: 2px solid transparent;
 }
 
-#todos.done header h2 {
+#tests.done header h2 {
   color: #bebebe;
   text-decoration: line-through;
 }

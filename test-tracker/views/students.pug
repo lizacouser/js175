@@ -1,0 +1,20 @@
+extends layout
+
+block main
+  if students === undefined || students.length === 0
+    p#no_list You don't have any students. Why not create one?
+  else
+    ul#students
+      each student in students
+        li
+          a(href=`/students/${student.id}`)
+            h2= student.name
+            p= student.logBaseline()
+            //- - let recentTest = student.mostRecentCompleted()
+            //- if !!recentTest
+            //-   p #{recentTest.getTitle()}: #{recentTest.getScore()}
+            //- p #{student.allDone().size()} / #{student.size()}
+
+block headerLinks
+  .actions
+    a.add(href="/students/new") New Student

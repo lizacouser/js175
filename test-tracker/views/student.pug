@@ -1,0 +1,46 @@
+extends layout
+
+block main
+  section#tests(class=student.isDone() ? "done" : "")
+    header
+      h2= student.name
+      ul
+        if student.size() > 0 && !student.isDone()
+          li
+            form.complete_all(action=`/students/${student.id}/complete_all`
+                              method="post")
+              button.check(type="submit") Complete All
+        li
+          form(action=`/students/${student.id}/edit` method="get")
+            button.edit(type="submit") Edit Student
+
+    ul
+      each test in tests
+        li(class=test.isDone() ? "done" : "")
+          form.check(action=`/students/${student.id}/tests/${test.id}/toggle`
+                     method="post")
+            input(type="hidden" name="done" value=!test.isDone())
+            button Done
+
+          form.score(action=`/students/${student.id}/tests/${test.id}/add-score`
+                     method="post")
+            input(type="text"
+                id="testScore"
+                name="testScore"
+                placeholder="500/500"
+                value=mathScore)
+
+          h3= test.title
+          if test.getScore() 
+            p= test.logScore()
+          //- form.delete(action=`/students/${student.id}/tests/${test.id}/destroy`
+          //-             method="post")
+          //-   button Delete
+
+    form(action=`/students/${student.id}/tests` method="post")
+      fieldset.actions
+        button Add test pack
+
+block headerLinks
+  .actions
+    a.student(href="/students") All Students
