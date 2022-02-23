@@ -5,13 +5,20 @@ block main
   p #{game.player.logWinnings()}
   p #{game.player.logBetSize()}
 
-  p &nbsp
-  p #{game.player.displayFullHand()}
-  p &nbsp
-  p #{game.dealer.displayHiddenHand()}
-  p &nbsp
-  h4 #{game.player.displayHandTotal()}
+  section#cards
+    br
+    h3 You:
+    for card in game.player.getHand()
+      -let link = `${card.getTitle().split(" ").join("_").toLowerCase()}.png`
+      img(src=`/images/PNG-cards-1.3/${link}`)
 
+    h3 Dealer:
+    for card in game.dealer.getHiddenHand()
+      -let link = `${card.getTitle().split(" ").join("_").toLowerCase()}.png`
+      img(src=`/images/PNG-cards-1.3/${link}`)
+
+  br
+  h4 #{game.player.displayHandTotal()}
 
   form(action=`/${game.id}/hit` method="post")
     fieldset.actions
@@ -21,10 +28,3 @@ block main
 block headerLinks
   .actions
     a(href=`/${game.id}`) "#{game.title}" Home
-
-//- // choose button whether to hit or stay
-//- // if hit, refresh and log new cards
-//- // if stay, check if busted 
-//- // if busted redirect to /end-game
-//- // if not busted, go to dealer move
-

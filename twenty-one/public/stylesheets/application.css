@@ -169,24 +169,31 @@ form fieldset.actions button:hover {
   color: #33cc99;
 }
 
-#lists h2 {
+#cards img {
+  max-width: 12%;
+  height: auto;
+  padding: 1%
+}
+
+#games h2 {
   float: left;
   width: 95%;
 }
 
-#lists a:hover {
+#games a:hover {
   color: #dd5f4f;
 }
 
-#lists p {
+#games p {
   color: #666666;
   float: right;
-  font-size: 0.9rem;
+  font-size: 1rem;
   text-align: right;
-  width: 5%;
+  width: 25%;
+  margin: 5px 10px 0px;
 }
 
-#lists li {
+#games li {
   background-color: #f6f6f6;
   border-radius: 8px;
   margin: 0 0 10px;
@@ -194,37 +201,37 @@ form fieldset.actions button:hover {
   position: relative;
 }
 
-#lists > ul {
+#games > ul {
   padding: 10px 0 50px;
 }
 
-#todos > ul li {
+/* #todos > ul li {
   border-bottom: 1px solid #d7d7d7;
   margin: 0 0 25px 60px;
   padding: 10px 0;
   position: relative;
-}
+} */
 
-#lists a {
+#games a {
   color: inherit;
   display: block;
   overflow: hidden;
 }
 
-#todos > ul li a {
+/* #todos > ul li a {
   overflow: hidden;
   position: absolute;
   text-indent: -8685px;
   top: 50%;
   z-index: 1;
-}
+} */
 
-#lists > ul li form {
+#games > ul li form {
   position: absolute;
   top: 50%;
   z-index: 1;
 }
-
+/* 
 #todos > ul li .check {
   height: 30px;
   left: -45px;
@@ -253,9 +260,9 @@ form fieldset.actions button:hover {
   cursor: pointer;
   height: 28px;
   width: 28px;
-}
+} */
 
-#lists > ul li .delete button {
+#games > ul li .delete button {
   background-color: transparent;
   border: none;
   color: transparent;
@@ -263,24 +270,24 @@ form fieldset.actions button:hover {
   height: 24px;
   width: 24px;
 }
-
+/* 
 #todos > ul li .check [type="submit"]:hover {
   border-color: #dd5f4f;
-}
+} */
 
-#lists > ul li .delete {
+#games > ul li .delete {
   background: transparent url("../images/icon_delete.png") 0 3px no-repeat;
   height: 27px;
-  margin: -12px 0 0;
+  margin: -16px 0 0;
   opacity: 0.4;
   right: 20px;
   width: 24px;
 }
 
-#lists > ul li .delete:hover {
+#games > ul li .delete:hover {
   opacity: 1;
 }
-
+/* 
 #todos > ul li.broke h3 {
   color: #bebebe;
   text-decoration: line-through;
@@ -304,7 +311,7 @@ form fieldset.actions button:hover {
   display: inline-block;
   vertical-align: middle;
   width: 50%;
-}
+} */
 
 #no_list {
   background: transparent url("../images/arrow_new_list.png") 85% 0 no-repeat;
@@ -312,7 +319,7 @@ form fieldset.actions button:hover {
   text-align: center;
 }
 
-#lists li::before {
+#games li::before {
   background-color: transparent;
   border-radius: 100%;
   content: "";
@@ -325,7 +332,7 @@ form fieldset.actions button:hover {
   z-index: 1;
 }
 
-#lists li.broke::before {
+#games li.broke::before {
   content: url('../images/icon_broke.png');
   transform: scale(0.2);
   margin: -15px 0 0 -7px;
@@ -333,20 +340,21 @@ form fieldset.actions button:hover {
   opacity: 0.5;
 }
 
-#lists li.rich::before {
+#games li.rich::before {
   content: url('../images/icon_rich.png');
   transform: scale(0.2);
   margin: -15px 0 0 -7px;
   right: 20px;
 }
 
-#lists li.broke h2 {
+#games li.broke h2 {
   color: #bebebe;
   text-decoration: line-through;
 }
 
-#lists li.broke p {
+#games li.broke p {
   color: #bebebe;
+  text-decoration: line-through;
 }
 
 @media screen and (max-width: 1080px) {
@@ -360,7 +368,7 @@ form fieldset.actions button:hover {
     max-width: 100%;
   }
 }
-
+/* 
 @media screen and (max-width: 650px) {
   #todos header h2 {
     display: block;
@@ -453,4 +461,4 @@ form fieldset.actions button:hover {
 #todos.broke header h2 {
   color: #bebebe;
   text-decoration: line-through;
-}
+} */

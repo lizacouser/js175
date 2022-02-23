@@ -3,18 +3,19 @@ extends layout.pug
 
 block main
   h2 Welcome to Twenty-One!
-  p &nbsp
+  br
   if games === undefined || games.length === 0
     p#no_list You don't have any games. Why not start one?
   else
-    section#lists
+    section#games
       ul
         each game in games
           li(class=game.player.isBroke()? "broke": "rich")
             a(href=`/${game.id}`)
               h2= game.title
-              
-                //- add line here about score slash money
+                p Winnings: $#{game.player.getWinnings()}
+                p Last Played: #{game.getTimeLastPlayed()}
+
             form.delete(action=`/${game.id}/destroy` method="post")
               button Delete
 

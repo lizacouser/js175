@@ -5,10 +5,10 @@ class Deck {
   static NUMBER_VALUES = {
     2: 2, 3: 3, 4: 4, 5: 5, 6: 6,
     7: 7, 8: 8, 9: 9, 10: 10,
-    J: Card.FACECARD_VALUE,
-    Q: Card.FACECARD_VALUE,
-    K: Card.FACECARD_VALUE,
-    A: Card.HIGH_ACE_VALUE
+    Jack: Card.FACECARD_VALUE,
+    Queen: Card.FACECARD_VALUE,
+    King: Card.FACECARD_VALUE,
+    Ace: Card.HIGH_ACE_VALUE
   }
 
   constructor() {
@@ -38,10 +38,6 @@ class Deck {
       const randomIndex = Math.floor(Math.random() * (index + 1));
       [cards[index], cards[randomIndex]] = [cards[randomIndex], cards[index]];
     }
-  }
-
-  static makeDeck(rawDeck) {
-    return new Deck();
   }
 }
 

@@ -13,6 +13,10 @@ class Participant {
     this.hand.push(card);
   }
 
+  getHand() {
+    return this.hand;
+  }
+
   clearHand() {
     this.hand = [];
   }
@@ -33,8 +37,8 @@ class Participant {
   }
 
   getHighAce() {
-    return this.hand.find(card => {
-      return card.getName() === "A" && card.getValue() === Card.HIGH_ACE_VALUE;
+    return this.getHand().find(card => {
+      return card.getName() === "Ace" && card.getValue() === Card.HIGH_ACE_VALUE;
     });
   }
 
@@ -47,7 +51,7 @@ class Participant {
   }
 
   logMove(move) {
-    return(`${this.name} ${move}`);
+    return (`${this.name} ${move}`);
   }
 
   displayFullHand() {
@@ -135,6 +139,12 @@ class Dealer extends Participant {
     this.hitThreshold = hitThreshold;
   }
 
+  getHiddenHand() {
+    let unknown = new Card();
+    unknown.title = "unknown card";
+    return [this.hand[0], unknown];
+  }
+
   getHitThreshold() {
     return this.hitThreshold;
   }
@@ -144,7 +154,7 @@ class Dealer extends Participant {
   }
 
   displayHiddenHand() {
-    let hiddenHand = ""
+    let hiddenHand = "";
     hiddenHand += "Dealer: ";
 
     let visibleCard = this.hand[0];
@@ -166,4 +176,4 @@ class Dealer extends Participant {
   }
 }
 
-module.exports = {Player, Dealer}
+module.exports = {Player, Dealer};

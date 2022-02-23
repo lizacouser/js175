@@ -6,7 +6,6 @@ const { body, validationResult } = require("express-validator");
 const TwentyOneGame = require('./lib/game');
 const sortGames = require('./lib/sortGames');
 const store = require("connect-loki");
-const req = require('express/lib/request');
 
 const app = express();
 const host = "localhost";
@@ -26,7 +25,7 @@ app.use(session({
     path: "/",
     secure: false,
   },
-  name: "launch-school-todos-session-id",
+  name: "launch-school-twenty-one-session-id",
   resave: false,
   saveUninitialized: true,
   secret: "this is not very secure",
@@ -36,7 +35,7 @@ app.use(session({
 app.use(flash());
 
 // Set up persistent session data
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
   let games = [];
   if ("games" in req.session) {
     req.session.games.forEach(game => {
@@ -65,11 +64,11 @@ app.get('/', (req, res) => {
   res.render('home', {
     games: sortGames(req.session.games),
   });
-})
+});
 
-app.get('/new', (req, res) => {
+app.get('/new', (_req, res) => {
   res.render('new-game');
-})
+});
 
 app.get('/:gameID', (req, res, next) => {
   let gameID = req.params.gameID;
@@ -82,7 +81,26 @@ app.get('/:gameID', (req, res, next) => {
       game: currentGame,
     });
   }
-})
+});
+
+
+app.get(`/:gameID/results`, (req, res, next) => {
+  let gameID = req.params.gameID;
+  let currentGame = loadGame(+gameID, req.session.games);
+
+  if (currentGame === undefined) {
+    next(new Error("Not found."));
+  } else {
+    currentGame.claimWinnings();
+    currentGame.setTimeLastPlayed(new Date());
+
+    res.render('results', {
+      game: currentGame,
+      moves: req.session.moves,
+    });
+  }
+});
+
 
 app.post("/:gameID/destroy", (req, res, next) => {
   let gameID = req.params.gameID;
@@ -98,9 +116,9 @@ app.post("/:gameID/destroy", (req, res, next) => {
     req.flash("success", "Game deleted");
     res.redirect("/");
   }
-})
+});
 
-app.post('/new', 
+app.post('/new',
   [
     body("gameTitle")
       .trim()
@@ -133,13 +151,13 @@ app.post('/new',
         flash: req.flash(),
         gameTitle: req.body.gameTitle,
         playerStartingAmount: req.body.playerStartingAmount,
-      })
+      });
     } else {
       let title = req.body.gameTitle;
-      let playerStartingDollars = Number(req.body.playerStartingAmount);
-      let defaultBetSize = 1; 
+      let playerStartingAmt = Number(req.body.playerStartingAmount);
+      let defaultBetSize = 1;
 
-      let newGame = new TwentyOneGame(title, defaultBetSize, playerStartingDollars)
+      let newGame = new TwentyOneGame(title, defaultBetSize, playerStartingAmt);
 
       req.session.games.push(newGame);
       req.flash("success", "The game has been created.");
@@ -147,22 +165,22 @@ app.post('/new',
       res.redirect(`/${newGame.id}`);
     }
   }
-)
+);
 
 app.post(`/:gameID/bet`, (req, res, next) => {
   let gameID = req.params.gameID;
   let currentGame = loadGame(+gameID, req.session.games);
-  
+
   if (currentGame === undefined) {
     next(new Error("Not found."));
   } else {
     res.render('bet', {
       game: currentGame,
-    })
+    });
   }
-})
+});
 
-app.post(`/:gameID/play`, 
+app.post(`/:gameID/play`,
   [
     body("playerBetSize")
       .notEmpty()
@@ -182,29 +200,23 @@ app.post(`/:gameID/play`,
       let errors = validationResult(req);
       if (!errors.isEmpty()) {
         errors.array().forEach(message => req.flash("error", message.msg));
-        res.render("bet", {
-          flash: req.flash(),
-          playerBetSize: req.body.playerBetSize,
-          game: currentGame,
-        })
+        res.render("bet", { flash: req.flash(), playerBetSize: req.body.playerBetSize, game: currentGame});
       } else {
-        currentGame.player.setBetSize(+req.body.playerBetSize)
+        currentGame.player.setBetSize(+req.body.playerBetSize);
         currentGame.deck.reset();
         currentGame.dealStartingHands();
-  
-        res.render('player-move', {
-          game: currentGame,
-        })
+
+        res.render('player-move', {game: currentGame});
       }
     }
   }
-)
+);
 
 
-app.post(`/:gameID/hit`, (req, res) => {
+app.post(`/:gameID/hit`, (req, res, next) => {
   let gameID = req.params.gameID;
   let currentGame = loadGame(+gameID, req.session.games);
-  
+
   if (currentGame === undefined) {
     next(new Error("Not found."));
   } else {
@@ -214,14 +226,14 @@ app.post(`/:gameID/hit`, (req, res) => {
       req.session.moves = [];
       res.redirect(`/${gameID}/results`);
     }
-  
+
     res.render('player-move', {
       game: currentGame,
-    })
+    });
   }
-})
+});
 
-app.post(`/:gameID/stay`, (req, res) => {
+app.post(`/:gameID/stay`, (req, res, next) => {
   let gameID = req.params.gameID;
   let currentGame = loadGame(+gameID, req.session.games);
 
@@ -232,44 +244,28 @@ app.post(`/:gameID/stay`, (req, res) => {
 
     while (currentGame.dealerUnderThreshold()) {
       currentGame.hit(currentGame.dealer);
-      moves.push("Dealer hits!");
+      moves.push("hit");
     }
-  
+
     if (currentGame.dealer.isBusted()) {
-      moves.push("DEALER BUSTED!");
+      moves.push("BUSTED!");
     } else {
-      moves.push("Dealer stays.")
+      moves.push("stayed");
     }
 
     req.session.moves = moves;
-  
-    res.redirect('results')
+
+    res.redirect('results');
   }
-})
-
-app.get(`/:gameID/results`, (req, res) => {
-  let gameID = req.params.gameID;
-  currentGame = loadGame(+gameID, req.session.games);
-
-  if (currentGame === undefined) {
-    next(new Error("Not found."));
-  } else {
-    currentGame.claimWinnings();
-
-    res.render('results', {
-      game: currentGame,
-      moves: req.session.moves,
-    });
-  }
-})
+});
 
 // Error handler
-app.use((err, req, res, _next) => {
+app.use((err, _req, res, _next) => {
   console.log(err); // Writes more extensive information to the console log
   res.status(404).send(err.message);
 });
 
 // Listener
 app.listen(port, host, () => {
-  console.log(`Todos is listening on port ${port} of ${host}!`);
+  console.log(`Twenty-One is listening on port ${port} of ${host}!`);
 });

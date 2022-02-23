@@ -2,16 +2,9 @@ extends layout
 
 block main
   h1 Dealer's turn!
-  p &nbsp
+  br
 
-  for move in moves
-    p #{move}
-
-  //- p &nbsp
-  //- p #{game.player.displayFullHand()}
-  //- p &nbsp
-  //- p #{game.dealer.displayFullHand()}
-
+  p Dealer #{moves.join(", ")}!
 
   form(action=`/${game.id}/results` method="get")
     fieldset.actions

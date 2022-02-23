@@ -10,6 +10,9 @@
     "readline-sync": "^1.4.10"
   },
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.12.1",
+    "eslint-cli": "^1.1.1",
     "nodemon": "^2.0.15"
   },
   "name": "twenty-one",
