@@ -105,7 +105,7 @@ app.post("/students",
   ],
 
   [
-    body("studentBaselineVerbal")
+    body("baselineV")
       .notEmpty()
       .withMessage("The baseline verbal score is required.")
       .bail()
@@ -128,12 +128,12 @@ app.post("/students",
       errors.array().forEach(message => req.flash("error", message.msg));
       res.render("new-student", {
         flash: req.flash(), studentName: req.body.studentName,
-        studentBaselineVerbal: req.body.studentBaselineVerbal,
+        baselineV: req.body.baselineV,
         studentBaselineMath: req.body.studentBaselineMath
       });
     } else {
       let baseline = [
-        +req.body.studentBaselineVerbal,
+        +req.body.baselineV,
         +req.body.studentBaselineMath
       ];
 
@@ -198,30 +198,21 @@ app.post("/students/:studentId/tests/:testId/toggle", (req, res, next) => {
 //   }
 // });
 
-// // Mark all todos as done
-// app.post("/lists/:todoListId/complete_all", (req, res, next) => {
-//   let todoListId = req.params.todoListId;
-//   let todoList = loadTodoList(+todoListId, req.session.todoLists);
-//   if (!todoList) {
-//     next(new Error("Not found."));
-//   } else {
-//     todoList.markAllDone();
-//     req.flash("success", "All todos have been marked as done.");
-//     res.redirect(`/lists/${todoListId}`);
-//   }
-// });
+// Mark all todos as done
+app.post("/students/:studentId/complete_all", (req, res, next) => {
+  let studentId = req.params.studentId;
+  let student = loadStudent(+studentId, req.session.students);
+  if (!student) {
+    next(new Error("Not found."));
+  } else {
+    student.markAllDone();
+    req.flash("success", "All todos have been marked as done.");
+    res.redirect(`/students/${studentId}`);
+  }
+});
 
 // // Create a new todo and add it to the specified list
-// app.post("/lists/:todoListId/todos",
-//   [
-//     body("todoTitle")
-//       .trim()
-//       .isLength({ min: 1 })
-//       .withMessage("The todo title is required.")
-//       .isLength({ max: 100 })
-//       .withMessage("Todo title must be between 1 and 100 characters."),
-//   ],
-//   (req, res, next) => {
+// app.post("/lists/:todoListId/todos", (req, res, next) => {
 //     let todoListId = req.params.todoListId;
 //     let todoList = loadTodoList(+todoListId, req.session.todoLists);
 //     if (!todoList) {
@@ -230,7 +221,6 @@ app.post("/students/:studentId/tests/:testId/toggle", (req, res, next) => {
 //       let errors = validationResult(req);
 //       if (!errors.isEmpty()) {
 //         errors.array().forEach(message => req.flash("error", message.msg));
-
 //         res.render("list", {flash: req.flash(), todoList: todoList, todos: sortTodos(todoList), todoTitle: req.body.todoTitle});
 //       } else {
 //         let todo = new Todo(req.body.todoTitle);
@@ -242,67 +232,87 @@ app.post("/students/:studentId/tests/:testId/toggle", (req, res, next) => {
 //   }
 // );
 
-// // Render edit todo list form
-// app.get("/lists/:todoListId/edit", (req, res, next) => {
-//   let todoListId = req.params.todoListId;
-//   let todoList = loadTodoList(+todoListId, req.session.todoLists);
-//   if (!todoList) {
-//     next(new Error("Not found."));
-//   } else {
-//     res.render("edit-list", { todoList });
-//   }
-// });
+// Render edit todo list form
+app.get("/students/:studentId/edit", (req, res, next) => {
+  let studentId = req.params.studentId;
+  let student = loadStudent(+studentId, req.session.students);
+  if (!student) {
+    next(new Error("Not found."));
+  } else {
+    res.render("edit-list", { student });
+  }
+});
 
-// // Delete todo list
-// app.post("/lists/:todoListId/destroy", (req, res, next) => {
-//   let todoLists = req.session.todoLists;
-//   let todoListId = +req.params.todoListId;
-//   let index = todoLists.findIndex(todoList => todoList.id === todoListId);
-//   if (index === -1) {
-//     next(new Error("Not found."));
-//   } else {
-//     todoLists.splice(index, 1);
+// Delete todo list
+app.post("/students/:studentId/destroy", (req, res, next) => {
+  let students = req.session.students;
+  let studentId = +req.params.studentId;
+  let index = students.findIndex(student => student.id === studentId);
+  if (index === -1) {
+    next(new Error("Not found."));
+  } else {
+    students.splice(index, 1);
 
-//     req.flash("success", "Todo list deleted.");
-//     res.redirect("/lists");
-//   }
-// });
+    req.flash("success", "Student deleted.");
+    res.redirect("/students");
+  }
+});
 
-// // Edit todo list title
-// app.post("/lists/:todoListId/edit",
-//   [
-//     body("todoListTitle")
-//       .trim()
-//       .isLength({ min: 1 })
-//       .withMessage("The list title is required.")
-//       .isLength({ max: 100 })
-//       .withMessage("List title must be between 1 and 100 characters.")
-//       .custom((title, { req }) => {
-//         let todoLists = req.session.todoLists;
-//         let duplicate = todoLists.find(list => list.title === title);
-//         return duplicate === undefined;
-//       })
-//       .withMessage("List title must be unique."),
-//   ],
-//   (req, res, next) => {
-//     let todoListId = req.params.todoListId;
-//     let todoList = loadTodoList(+todoListId, req.session.todoLists);
-//     if (!todoList) {
-//       next(new Error("Not found."));
-//     } else {
-//       let errors = validationResult(req);
-//       if (!errors.isEmpty()) {
-//         errors.array().forEach(message => req.flash("error", message.msg));
+// Edit todo list title
+app.post("/students/:studentId/edit",
+  [
+    body("studentName")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("The student name is required.")
+      .isLength({ max: 100 })
+      .withMessage("Student name must be between 1 and 100 characters.")
+      .custom((title, { req }) => {
+        let students = req.session.students;
+        let duplicate = students.find(student => student.title === title);
+        return duplicate === undefined;
+      })
+      .withMessage("Student name must be unique."),
+  ],
 
-//         res.render("edit-list", {flash: req.flash(), todoListTitle: req.body.todoListTitle, todoList: todoList});
-//       } else {
-//         todoList.setTitle(req.body.todoListTitle);
-//         req.flash("success", "Todo list updated.");
-//         res.redirect(`/lists/${todoListId}`);
-//       }
-//     }
-//   }
-// );
+  [
+    body("baselineV")
+      .notEmpty()
+      .withMessage("The baseline verbal score is required.")
+      .bail()
+      .isInt({ min: 400, max: 800 })
+      .withMessage(`Baseline verbal score must be between 400 and 800.`)
+  ],
+
+  [
+    body("studentBaselineMath")
+      .notEmpty()
+      .withMessage("The baseline math score is required.")
+      .bail()
+      .isInt({ min: 400, max: 800 })
+      .withMessage(`Baseline math score must be between 400 and 800.`)
+  ],
+
+  (req, res, next) => {
+    let studentId = req.params.studentId;
+    let student = loadStudent(+studentId, req.session.students);
+    if (!student) {
+      next(new Error("Not found."));
+    } else {
+      let errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        errors.array().forEach(message => req.flash("error", message.msg));
+
+        res.render("edit-list", {flash: req.flash(), studentName: req.body.studentName, student: student, baselineV: req.body.baselineV, studentBaselineMath: req.body.studentBaselineMath});
+      } else {
+        student.setName(req.body.studentName);
+        student.setBaseline([req.body.baselineV, req.body.studentBaselineMath]);
+        req.flash("success", "Student updated.");
+        res.redirect(`/students/${studentId}`);
+      }
+    }
+  }
+);
 
 // Error handler
 app.use((err, _req, res, _next) => {

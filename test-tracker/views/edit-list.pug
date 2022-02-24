@@ -3,21 +3,40 @@ extend layout
 block main
   section#tests
     header
-      h2 Editing '#{todoList.title}'
+      h2 Editing '#{student.name}'
       ul
         li
-          form.delete(action=`/lists/${todoList.id}/destroy` method="post")
-            button.delete(type="submit") Delete List
+          form.delete(action=`/students/${student.id}/destroy` method="post")
+            button.delete(type="submit") Delete Student
 
-  form(action=`/lists/${todoList.id}/edit` method="post")
+  form(action=`/students/${student.id}/edit` method="post")
     dl
       dt
-        label(for="todoListTitle") Enter the new title for the list:
+        label(for="studentName") Enter the new name for the student:
       dd
         input(type="text"
-              name="todoListTitle"
-              placeholder="List Title"
-              value=todoListTitle || todoList.title)
+              name="studentName"
+              placeholder="Student Name"
+              value=studentName || student.name)
+
+      dt
+        p Enter a new baseline for the student:
+        dd
+          label(for="baselineV") Verbal
+          input(type="number"
+                id="baselineV"
+                name="baselineV"
+                placeholder=500
+                value=baselineV || student.baseline[0])
+
+        dd
+          label(for="studentBaselineMath") Math
+          input(type="number"
+                id="studentBaselineMath"
+                name="studentBaselineMath"
+                placeholder=500
+                value=studentBaselineMath || student.baseline[1])
+
     fieldset.actions
       input(type="submit" value="Save")
-      a(href=`/lists/${todoList.id}`) Cancel
+      a(href=`/students/${student.id}`) Cancel
