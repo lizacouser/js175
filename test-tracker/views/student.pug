@@ -17,25 +17,36 @@ block main
     ul
       each test in tests
         li(class=test.isDone() ? "done" : "")
-          form.check(action=`/students/${student.id}/tests/${test.id}/toggle`
-                     method="post")
+          form.check(action=`/students/${student.id}/tests/${test.id}/toggle` method="post")
             input(type="hidden" name="done" value=!test.isDone())
-            button Done
-
-          form.score(action=`/students/${student.id}/tests/${test.id}/add-score`
-                     method="post")
-            input(type="text"
-                id="testScore"
-                name="testScore"
-                placeholder="500/500"
+            input(type="number"
+                id="verbalScore"
+                name="verbalScore"
+                placeholder="500"
+                value=verbalScore)
+            input(type="number"
+                id="mathScore"
+                name="mathScore"
+                placeholder="500"
                 value=mathScore)
-
+            input(type="checkbox" id="projected" name="projected" value="Projected")
+            label(for="projected") Projected 
+            input(type="checkbox" id="mock" name="mock" value="Mock")
+            label(for="mock") Mock
+            button Done
+          br
+          br
+          br
+          br
+          br
+          br
           h3= test.title
           if test.getScore() 
-            p= test.logScore()
-          //- form.delete(action=`/students/${student.id}/tests/${test.id}/destroy`
-          //-             method="post")
-          //-   button Delete
+            if test.projected === true
+              p *#{test.logScore()}
+            else
+              p= test.logScore()
+
 
     form(action=`/students/${student.id}/tests` method="post")
       fieldset.actions

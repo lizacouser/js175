@@ -1,6 +1,9 @@
 const nextId = require("./next-id");
 
 class Test {
+  static MAX_SAT_SCORE = 800;
+  static MIN_SAT_SCORE = 400;
+
   static PACKS = {
     "2020 Blue Book": [
       "BB10", "BB9", "BB8", "BB7",
@@ -50,8 +53,25 @@ class Test {
     this.title = title;
   }
 
-  setScore(verbal, math) {
-    this.score = [verbal, math];
+  setScore(verbal, math, projected, mock) {
+    console.log("\n\n\n\n\n\n\n\n\n\n\n calling isValidScore");
+    if (this.isValidScore(+verbal, +math)) {
+      this.score = [+verbal, +math];
+      this.isProjectedScore = projected;
+      this.isMock = mock;
+    }
+  }
+
+  clearScore() {
+    this.score = null;
+    this.isProjected = null;
+    this.mock = null;
+  }
+
+  isValidScore(verbal, math) {
+    let isInt = Number.isInteger(verbal) && Number.isInteger(math);
+    let aboveMin = verbal > Test.MIN_SAT_SCORE && math > Test.MIN_SAT_SCORE;
+    return isInt && aboveMin;
   }
 
   getScore() {

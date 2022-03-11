@@ -4,16 +4,21 @@ block main
   if students === undefined || students.length === 0
     p#no_list You don't have any students. Why not create one?
   else
-    ul#students
-      each student in students
-        li
-          a(href=`/students/${student.id}`)
-            h2= student.name
+    section#students
+      ul
+        each student in students
+          li
+            a(href=`/students/${student.id}`)
+              h2= student.name
+            p #{student.allDone().length} / #{student.size()} completed
+            - let recentTest = student.mostRecentCompleted()
+            if !!recentTest && !!recentTest.getScore()
+              p #{recentTest.getTitle()}: #{recentTest.getScore()}
             p= student.logBaseline()
-            //- - let recentTest = student.mostRecentCompleted()
-            //- if !!recentTest
-            //-   p #{recentTest.getTitle()}: #{recentTest.getScore()}
-            //- p #{student.allDone().size()} / #{student.size()}
+
+            form.delete(action=`/students/${student.id}/destroy` method="post")
+              button Delete
+           
 
 block headerLinks
   .actions

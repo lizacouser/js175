@@ -20,10 +20,6 @@ class Student {
         this.tests.push(new Test(testName, testPack));
       });
     });
-
-
-    console.log("\n\n\n\n\n\n\n\n\n\n\n MADE A TEST PACK");
-    console.log(JSON.stringify(this.tests));
   }
 
   add(test) {
@@ -35,7 +31,7 @@ class Student {
   }
 
   mostRecentCompleted() {
-    return this.tests.allDone().sort((testA, testB) => {
+    return this.allDone().sort((testA, testB) => {
       return testB.dateTaken - testA.dateTaken;
     })[0];
   }
@@ -94,7 +90,7 @@ class Student {
 
   filter(callback) {
     let newStudent = new Student(this.name, this.baseline);
-    this.forEach(test => {
+    this.tests.forEach(test => {
       if (callback(test)) {
         newStudent.add(test);
       }
@@ -104,11 +100,11 @@ class Student {
   }
 
   findByName(name) {
-    return this.filter(test => test.name === name).first();
+    return this.tests.filter(test => test.name === name).first();
   }
 
   findById(id) {
-    return this.filter(test => test.id === id).first();
+    return this.tests.filter(test => test.id === id).first();
   }
 
   findIndexOf(testToFind) {
@@ -117,15 +113,15 @@ class Student {
   }
 
   allDone() {
-    return this.filter(test => test.isDone());
+    return this.tests.filter(test => test.isDone());
   }
 
   allNotDone() {
-    return this.filter(test => !test.isDone());
+    return this.tests.filter(test => !test.isDone());
   }
 
   allTests() {
-    return this.filter(_ => true);
+    return this.tests.filter(_ => true);
   }
 
   markDone(name) {
@@ -136,11 +132,11 @@ class Student {
   }
 
   markAllDone() {
-    this.forEach(test => test.markDone());
+    this.tests.forEach(test => test.markDone());
   }
 
   markAllUndone() {
-    this.forEach(test => test.markUndone());
+    this.tests.forEach(test => test.markUndone());
   }
 
   toArray() {
@@ -166,7 +162,6 @@ class Student {
       baseline: rawStudent.baseline,
       tests: [],
     });
-    console.log("trying to make student from session data");
     rawStudent.tests.forEach(test => student.add(Test.makeTest(test)));
     return student;
   }

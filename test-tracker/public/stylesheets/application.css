@@ -164,12 +164,15 @@ form fieldset.actions a:hover {
   width: 95%;
 }
 
-#students p {
+#students > ul li p {
   color: #666666;
   float: right;
   font-size: 0.9rem;
   text-align: right;
-  width: 5%;
+  border-color: transparent;
+  border-style: solid;
+  margin: -23px 40px 0 0;
+  /* padding: 0px 40px 20px 0px; */
 }
 
 #students li {
@@ -206,6 +209,12 @@ form fieldset.actions a:hover {
 }
 
 #tests > ul li form {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+}
+
+#students > ul li form {
   position: absolute;
   top: 50%;
   z-index: 1;
@@ -250,31 +259,31 @@ form fieldset.actions a:hover {
   width: 150px;
 }
 
-/* #tests > ul li .delete button {
+#students > ul li .delete button {
   background-color: transparent;
   border: none;
   color: transparent;
   cursor: pointer;
   height: 24px;
   width: 24px;
-} */
+}
 
 #tests > ul li .check [type="submit"]:hover {
   border-color: #dd5f4f;
 }
 
-/* #tests > ul li .delete {
+#students > ul li .delete {
   background: transparent url("../images/icon_delete.png") 0 3px no-repeat;
   height: 27px;
-  margin: -12px 0 0;
+  margin: -16px 0 0;
   opacity: 0.4;
   right: 20px;
   width: 24px;
-} */
+}
 
-/* #tests > ul li .delete:hover {
+#students > ul li .delete:hover {
   opacity: 1;
-} */
+}
 
 #tests > ul li.done h3 {
   color: #bebebe;
@@ -430,11 +439,11 @@ form fieldset.actions a:hover {
   border: 2px solid #3f3f3f;
 }
 
-#tests header ul button.delete:hover {
+#students header ul button.delete:hover {
   color: #b00b00;
 }
 
-#tests header ul button.delete::before {
+#students header ul button.delete::before {
   background: transparent url("../images/icon_delete.png") 0 0 no-repeat;
   border: 2px solid transparent;
 }

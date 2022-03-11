@@ -1,10 +1,11 @@
+/* eslint-disable max-lines-per-function */
 const express = require("express");
 const morgan = require("morgan");
 const flash = require("express-flash");
 const session = require("express-session");
 const { body, validationResult } = require("express-validator");
 const Student = require("./lib/student");
-const Test = require("./lib/test");
+// const Test = require("./lib/test");
 const { sortStudents, sortTests } = require("./lib/sort");
 const store = require("connect-loki");
 
@@ -160,43 +161,79 @@ app.get("/students/:studentId", (req, res, next) => {
 });
 
 // Toggle completion status of a todo
-app.post("/students/:studentId/tests/:testId/toggle", (req, res, next) => {
-  let { studentId, testId } = { ...req.params };
-  let test = loadTest(+studentId, +testId, req.session.students);
-  if (!test) {
+app.post("/students/:studentId/tests/:testId/toggle",
+  [
+    body("verbalScore")
+      .optional({ checkFalsy: true })
+      .isInt({ min: 400, max: 800 })
+      .withMessage(`Verbal score must be between 400 and 800.`)
+  ],
+
+  [
+    body("mathScore")
+      .optional({ checkFalsy: true })
+      .isInt({ min: 400, max: 800 })
+      .withMessage(`Math score must be between 400 and 800.`)
+  ],
+
+  // eslint-disable-next-line max-lines-per-function
+  // eslint-disable-next-line max-statements
+  (req, res, next) => {
+    let { studentId, testId } = { ...req.params };
+    let student = loadStudent(+studentId, req.session.students);
+
+    if (!student) {
+      next(new Error("Not found."));
+    } else {
+      let test = loadTest(+studentId, +testId, req.session.students);
+      if (!test) {
+        next(new Error("Not Found."));
+      } else {
+        let errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          errors.array().forEach(message => req.flash("error", message.msg));
+
+          res.render("student", {
+            flash: req.flash(),
+            student: student,
+            tests: sortTests(student.tests),
+            verbalScore: req.body.verbalScore,
+            mathScore: req.body.mathScore});
+        } else {
+          let title = test.title;
+          if (test.isDone()) {
+            test.markUndone();
+            test.clearScore();
+            req.flash("success", `"${title}" marked as NOT done!`);
+          } else {
+            test.setScore(req.body.verbalScore, req.body.mathScore, req.body.projected, req.body.mock);
+            test.markDone();
+            req.flash("success", `"${title}" marked done.`);
+          }
+          res.redirect(`/students/${studentId}`);
+        }
+      }
+    }
+  }
+);
+
+// Delete a student
+app.post("/students/:studentId/destroy", (req, res, next) => {
+  let studentId = req.params.studentId;
+
+  let index = req.session.students.findIndex(student => {
+    return student.id === +studentId;
+  });
+
+  if (index === -1) {
     next(new Error("Not found."));
   } else {
-    let title = test.title;
-    if (test.isDone()) {
-      test.markUndone();
-      req.flash("success", `"${title}" marked as NOT done!`);
-    } else {
-      test.markDone();
-      req.flash("success", `"${title}" marked done.`);
-    }
+    req.session.students.splice(index, 1);
 
-    res.redirect(`/students/${studentId}`);
+    req.flash("success", "Student deleted.");
+    res.redirect("/");
   }
 });
-
-// // Delete a todo
-// app.post("/lists/:todoListId/todos/:todoId/destroy", (req, res, next) => {
-//   let { todoListId, todoId } = { ...req.params };
-
-//   let todoList = loadTodoList(+todoListId, req.session.todoLists);
-//   if (!todoList) {
-//     next(new Error("Not found."));
-//   } else {
-//     let todo = loadTodo(+todoListId, +todoId, req.session.todoLists);
-//     if (!todo) {
-//       next(new Error("Not found."));
-//     } else {
-//       todoList.removeAt(todoList.findIndexOf(todo));
-//       req.flash("success", "The todo has been deleted.");
-//       res.redirect(`/lists/${todoListId}`);
-//     }
-//   }
-// });
 
 // Mark all todos as done
 app.post("/students/:studentId/complete_all", (req, res, next) => {
