@@ -194,11 +194,9 @@ app.post("/students/:studentId/tests/:testId/toggle",
           errors.array().forEach(message => req.flash("error", message.msg));
 
           res.render("student", {
-            flash: req.flash(),
             student: student,
             tests: sortTests(student.tests),
-            verbalScore: req.body.verbalScore,
-            mathScore: req.body.mathScore});
+          });
         } else {
           let title = test.title;
           if (test.isDone()) {
@@ -206,7 +204,8 @@ app.post("/students/:studentId/tests/:testId/toggle",
             test.clearScore();
             req.flash("success", `"${title}" marked as NOT done!`);
           } else {
-            test.setScore(req.body.verbalScore, req.body.mathScore, req.body.projected, req.body.mock);
+            test.setScore(req.body.verbalScore, req.body.mathScore,
+              req.body.projected, req.body.mock);
             test.markDone();
             req.flash("success", `"${title}" marked done.`);
           }
@@ -231,7 +230,7 @@ app.post("/students/:studentId/destroy", (req, res, next) => {
     req.session.students.splice(index, 1);
 
     req.flash("success", "Student deleted.");
-    res.redirect("/");
+    res.redirect("/students");
   }
 });
 
@@ -248,26 +247,18 @@ app.post("/students/:studentId/complete_all", (req, res, next) => {
   }
 });
 
-// // Create a new todo and add it to the specified list
-// app.post("/lists/:todoListId/todos", (req, res, next) => {
-//     let todoListId = req.params.todoListId;
-//     let todoList = loadTodoList(+todoListId, req.session.todoLists);
-//     if (!todoList) {
-//       next(new Error("Not found."));
-//     } else {
-//       let errors = validationResult(req);
-//       if (!errors.isEmpty()) {
-//         errors.array().forEach(message => req.flash("error", message.msg));
-//         res.render("list", {flash: req.flash(), todoList: todoList, todos: sortTodos(todoList), todoTitle: req.body.todoTitle});
-//       } else {
-//         let todo = new Todo(req.body.todoTitle);
-//         todoList.add(todo);
-//         req.flash("success", "The todo has been created.");
-//         res.redirect(`/lists/${todoListId}`);
-//       }
-//     }
-//   }
-// );
+// add test pack to student test list
+app.post("/students/:studentId/tests", (req, res, next) => {
+  let studentId = req.params.studentId;
+  let student = loadStudent(+studentId, req.session.students);
+  if (!student) {
+    next(new Error("Not found."));
+  } else {
+    student.addNextTestPack("SAT");
+    req.flash("success", "Test pack has been added.");
+    res.redirect(`/students/${studentId}`);
+  }
+});
 
 // Render edit todo list form
 app.get("/students/:studentId/edit", (req, res, next) => {

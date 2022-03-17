@@ -7,19 +7,36 @@ class Student {
     console.log("creating student");
     this.id = nextId();
     this.name = name;
-    this.createPack();
+    this.createFirstPack("SAT");
     this.baseline = baseline;
   }
 
-  createPack() {
-    this.tests = [];
-    Object.keys(Test.PACKS).forEach(testPack => {
-      let testList = Test.PACKS[testPack];
+  createFirstPack(plan) {
+    let testPacks = Test.PACK_ORDER[plan];
+    let firstPack = testPacks[0];
 
-      testList.forEach(testName => {
-        this.tests.push(new Test(testName, testPack));
-      });
+    this.tests = [];
+    this.addTestPack(firstPack);
+  }
+
+  addTestPack(packName) {
+    let testList = Test.PACKS[packName];
+
+    testList.forEach(testName => {
+      this.tests.push(new Test(testName, packName));
     });
+
+    this.currentTestPack = packName;
+  }
+
+  addNextTestPack(plan) {
+    let testPacks = Test.PACK_ORDER[plan];
+    let nextIndex = testPacks.indexOf(this.currentTestPack) + 1;
+
+    if (nextIndex < testPacks.length) {
+      let nextPack = testPacks[nextIndex];
+      this.addTestPack(nextPack);
+    }
   }
 
   add(test) {
@@ -161,8 +178,11 @@ class Student {
       name: rawStudent.name,
       baseline: rawStudent.baseline,
       tests: [],
+      currentTestPack: rawStudent.currentTestPack,
     });
-    rawStudent.tests.forEach(test => student.add(Test.makeTest(test)));
+    if (rawStudent.tests) {
+      rawStudent.tests.forEach(test => student.add(Test.makeTest(test)));
+    }
     return student;
   }
 
