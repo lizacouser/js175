@@ -24,12 +24,22 @@ block main
                 value=baselineV || 500)
 
         dd
-          label(for="studentBaselineMath") Math
+          label(for="baselineM") Math
           input(type="number"
-                id="studentBaselineMath"
-                name="studentBaselineMath"
+                id="baselineM"
+                name="baselineM"
                 placeholder=500
-                value=studentBaselineMath || 500)
+                value=baselineM || 500)
+
+      br
+      p Enter your student's test plan:
+      dt
+        dd
+          label(for="SAT") SAT 
+          input(type="radio" id="SAT" name="testPlan" value="SAT" required=true)
+          label(for="ACT") ACT
+          input(type="radio" id="ACT" name="testPlan" value="ACT" required=true)
+
 
     fieldset.actions
       input(type="submit" value="Save")

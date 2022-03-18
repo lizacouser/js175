@@ -5,7 +5,7 @@ const flash = require("express-flash");
 const session = require("express-session");
 const { body, validationResult } = require("express-validator");
 const Student = require("./lib/student");
-// const Test = require("./lib/test");
+const Test = require("./lib/test");
 const { sortStudents, sortTests } = require("./lib/sort");
 const store = require("connect-loki");
 
@@ -115,7 +115,7 @@ app.post("/students",
   ],
 
   [
-    body("studentBaselineMath")
+    body("baselineM")
       .notEmpty()
       .withMessage("The baseline math score is required.")
       .bail()
@@ -130,12 +130,12 @@ app.post("/students",
       res.render("new-student", {
         flash: req.flash(), studentName: req.body.studentName,
         baselineV: req.body.baselineV,
-        studentBaselineMath: req.body.studentBaselineMath
+        baselineM: req.body.baselineM
       });
     } else {
       let baseline = [
         +req.body.baselineV,
-        +req.body.studentBaselineMath
+        +req.body.baselineM
       ];
 
       let student = new Student(req.body.studentName, baseline);
@@ -156,6 +156,7 @@ app.get("/students/:studentId", (req, res, next) => {
     res.render("student", {
       student: student,
       tests: sortTests(student.tests),
+      showAll: true,
     });
   }
 });
@@ -196,6 +197,7 @@ app.post("/students/:studentId/tests/:testId/toggle",
           res.render("student", {
             student: student,
             tests: sortTests(student.tests),
+            showAll: true,
           });
         } else {
           let title = test.title;
@@ -242,8 +244,38 @@ app.post("/students/:studentId/complete_all", (req, res, next) => {
     next(new Error("Not found."));
   } else {
     student.markAllDone();
-    req.flash("success", "All todos have been marked as done.");
+    req.flash("success", "All tests have been marked as done.");
     res.redirect(`/students/${studentId}`);
+  }
+});
+
+// show all tests
+app.post("/students/:studentId/show_all", (req, res, next) => {
+  let studentId = req.params.studentId;
+  let student = loadStudent(+studentId, req.session.students);
+  if (!student) {
+    next(new Error("Not found."));
+  } else {
+    res.render("student", {
+      student: student,
+      tests: sortTests(student.tests),
+      showAll: true,
+    });
+  }
+});
+
+// show current tests only
+app.post("/students/:studentId/show_current", (req, res, next) => {
+  let studentId = req.params.studentId;
+  let student = loadStudent(+studentId, req.session.students);
+  if (!student) {
+    next(new Error("Not found."));
+  } else {
+    res.render("student", {
+      student: student,
+      tests: sortTests(student.tests),
+      showAll: false,
+    });
   }
 });
 
@@ -254,8 +286,36 @@ app.post("/students/:studentId/tests", (req, res, next) => {
   if (!student) {
     next(new Error("Not found."));
   } else {
-    student.addNextTestPack("SAT");
-    req.flash("success", "Test pack has been added.");
+    let testPacks = Test.PACK_ORDER["SAT"]; // replace with student.plan later
+    let nextIndex = testPacks.indexOf(student.currentTestPack) + 1;
+
+    if (nextIndex < testPacks.length) {
+      let nextPack = testPacks[nextIndex];
+      student.addTestPack(nextPack);
+      req.flash("success", "Test pack has been added.");
+    } else {
+      req.flash("error", "No more test packs available.");
+    }
+    res.redirect(`/students/${studentId}`);
+  }
+});
+
+// add test pack to student test list
+app.post("/students/:studentId/remove_tests", (req, res, next) => {
+  let studentId = req.params.studentId;
+  let student = loadStudent(+studentId, req.session.students);
+  if (!student) {
+    next(new Error("Not found."));
+  } else {
+    let testPacks = Test.PACK_ORDER["SAT"];
+    let currentIndex = testPacks.indexOf(student.currentTestPack);
+
+    if (currentIndex > 0) {
+      student.removeTestPack(student.currentTestPack);
+      req.flash("success", "Test pack has been removed.");
+    } else {
+      req.flash("error", "Cannot remove first test pack in plan.");
+    }
     res.redirect(`/students/${studentId}`);
   }
 });
@@ -313,7 +373,7 @@ app.post("/students/:studentId/edit",
   ],
 
   [
-    body("studentBaselineMath")
+    body("baselineM")
       .notEmpty()
       .withMessage("The baseline math score is required.")
       .bail()
@@ -331,10 +391,11 @@ app.post("/students/:studentId/edit",
       if (!errors.isEmpty()) {
         errors.array().forEach(message => req.flash("error", message.msg));
 
-        res.render("edit-list", {flash: req.flash(), studentName: req.body.studentName, student: student, baselineV: req.body.baselineV, studentBaselineMath: req.body.studentBaselineMath});
+        res.render("edit-list", {flash: req.flash(), studentName: req.body.studentName, student: student, baselineV: req.body.baselineV, baselineM: req.body.baselineM});
       } else {
         student.setName(req.body.studentName);
-        student.setBaseline([req.body.baselineV, req.body.studentBaselineMath]);
+        student.setBaseline([req.body.baselineV, req.body.baselineM]);
+        student.setTestPlan(req.body.testPlan);
         req.flash("success", "Student updated.");
         res.redirect(`/students/${studentId}`);
       }

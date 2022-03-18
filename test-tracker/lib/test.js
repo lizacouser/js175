@@ -59,7 +59,6 @@ class Test {
   }
 
   setScore(verbal, math, projected, mock) {
-    console.log("\n\n\n\n\n\n\n\n\n\n\n calling isValidScore");
     if (this.isValidScore(+verbal, +math)) {
       this.score = [+verbal, +math];
       this.isProjectedScore = projected;

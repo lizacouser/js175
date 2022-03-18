@@ -290,6 +290,11 @@ form fieldset.actions a:hover {
   text-decoration: line-through;
 }
 
+#tests > ul li.done p {
+  color: #bebebe;
+  text-decoration: line-through;
+}
+
 #tests.done header .check {
   display: none;
 }

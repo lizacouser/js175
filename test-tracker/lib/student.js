@@ -4,11 +4,14 @@ const Test = require("./test");
 
 class Student {
   constructor(name, baseline) {
-    console.log("creating student");
     this.id = nextId();
     this.name = name;
     this.createFirstPack("SAT");
     this.baseline = baseline;
+  }
+
+  setTestPlan(plan) {
+    this.testPlan = plan;
   }
 
   createFirstPack(plan) {
@@ -29,14 +32,13 @@ class Student {
     this.currentTestPack = packName;
   }
 
-  addNextTestPack(plan) {
-    let testPacks = Test.PACK_ORDER[plan];
-    let nextIndex = testPacks.indexOf(this.currentTestPack) + 1;
+  removeTestPack(packName) {
+    let testList = Test.PACKS[packName];
 
-    if (nextIndex < testPacks.length) {
-      let nextPack = testPacks[nextIndex];
-      this.addTestPack(nextPack);
-    }
+    testList.forEach(testName => {
+      this.tests.splice(this.tests.indexOf(testName), 1);
+    });
+    this.currentTestPack = this.last().testPack;
   }
 
   add(test) {
@@ -179,6 +181,7 @@ class Student {
       baseline: rawStudent.baseline,
       tests: [],
       currentTestPack: rawStudent.currentTestPack,
+      testPlan: rawStudent.testPlan,
     });
     if (rawStudent.tests) {
       rawStudent.tests.forEach(test => student.add(Test.makeTest(test)));
