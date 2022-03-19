@@ -4,7 +4,7 @@ block main
   form(action="/students" method="post")
     dl
       dt
-        label(for="studentName") Enter your student's name:
+        h2 Enter your student's name:
       dd
         input(type="text"
               id="studentName"
@@ -13,32 +13,64 @@ block main
               value=studentName)
 
       br
-      p Enter your student's baseline score:
-      dt
-        dd
-          label(for="baselineV") Verbal
-          input(type="number"
-                id="baselineV"
-                name="baselineV"
-                placeholder=500
-                value=baselineV || 500)
 
-        dd
-          label(for="baselineM") Math
-          input(type="number"
-                id="baselineM"
-                name="baselineM"
-                placeholder=500
-                value=baselineM || 500)
+      dt
+        h2 Enter your student's baseline score:
+      dd
+        label(for="baselineV") SAT: 
+        input(type="number"
+              id="baselineV"
+              name="baselineV"
+              placeholder="Verbal"
+              value=baselineV)
+
+        label(for="baselineM") /
+        input(type="number"
+              id="baselineM"
+              name="baselineM"
+              placeholder="Math"
+              value=baselineM)
+
+      dd
+        label(for="baselineE") ACT: 
+        input(type="number"
+              id="baselineE"
+              name="baselineE"
+              placeholder="English"
+              value=baselineE)
+
+        label(for="baselineACTm") /
+        input(type="number"
+              id="baselineACTm"
+              name="baselineACTm"
+              placeholder="Math"
+              value=baselineACTm)
+
+        label(for="baselineR") /
+        input(type="number"
+              id="baselineR"
+              name="baselineR"
+              placeholder="Reading"
+              value=baselineR)
+
+        label(for="baselineS") /
+        input(type="number"
+              id="baselineS"
+              name="baselineS"
+              placeholder="Science"
+              value=baselineS)
 
       br
-      p Enter your student's test plan:
       dt
-        dd
-          label(for="SAT") SAT 
-          input(type="radio" id="SAT" name="testPlan" value="SAT" required=true)
-          label(for="ACT") ACT
-          input(type="radio" id="ACT" name="testPlan" value="ACT" required=true)
+        h2 Enter your student's test plan:
+      dd
+        label(for="SAT") SAT 
+        input(type="radio" id="SAT" name="testPlan" value="SAT" required=true)
+
+      dd
+        label(for="ACT") ACT
+        input(type="radio" id="ACT" name="testPlan" value="ACT" required=true)
+      br
 
 
     fieldset.actions

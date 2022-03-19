@@ -3,10 +3,11 @@ const Test = require("./test");
 
 
 class Student {
-  constructor(name, baseline) {
+  constructor(name, testPlan, baseline) {
     this.id = nextId();
     this.name = name;
-    this.createFirstPack("SAT");
+    this.testPlan = testPlan;
+    this.createFirstPack(testPlan);
     this.baseline = baseline;
   }
 
@@ -108,7 +109,7 @@ class Student {
   }
 
   filter(callback) {
-    let newStudent = new Student(this.name, this.baseline);
+    let newStudent = new Student(this.name, this.testPlan, this.baseline);
     this.tests.forEach(test => {
       if (callback(test)) {
         newStudent.add(test);
@@ -171,21 +172,33 @@ class Student {
   }
 
   logBaseline() {
-    return `Baseline: ${this.baseline[0]}V/${this.baseline[1]}M`;
+    if (Array.isArray(this.baseline)) {
+      let scoreSum = this.baseline.reduce((acc, val) => acc + val);
+      if (this.baseline.length === 2) {
+        let cumulative = scoreSum;
+        return `Baseline: ${this.baseline[0]}V/${this.baseline[1]}M (${cumulative}C)`;
+      } else if (this.baseline.length === 4) {
+        let cumulative = Math.round(scoreSum / this.baseline.length);
+        return `Baseline: ${this.baseline[0]}E/${this.baseline[1]}M/${this.baseline[2]}R/${this.baseline[3]}S (${cumulative}C)`;
+      }
+    }
+    return `No Baseline`;
   }
 
   static makeStudent(rawStudent) {
-    let student = Object.assign(new Student(), {
+    // eslint-disable-next-line max-len
+    let student = Object.assign(new Student(rawStudent.name, rawStudent.testPlan, rawStudent.baseline), {
       id: rawStudent.id,
-      name: rawStudent.name,
-      baseline: rawStudent.baseline,
+      // name: rawStudent.name,
+      // baseline: rawStudent.baseline,
       tests: [],
       currentTestPack: rawStudent.currentTestPack,
-      testPlan: rawStudent.testPlan,
+      // testPlan: rawStudent.testPlan,
     });
     if (rawStudent.tests) {
       rawStudent.tests.forEach(test => student.add(Test.makeTest(test)));
     }
+
     return student;
   }
 

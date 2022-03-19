@@ -12,30 +12,74 @@ block main
   form(action=`/students/${student.id}/edit` method="post")
     dl
       dt
-        label(for="studentName") Enter the new name for the student:
+        h2 Enter new name for student:
       dd
         input(type="text"
+              id="studentName"
               name="studentName"
               placeholder="Student Name"
               value=studentName || student.name)
 
-      dt
-        p Enter a new baseline for the student:
-        dd
-          label(for="baselineV") Verbal
-          input(type="number"
-                id="baselineV"
-                name="baselineV"
-                placeholder=500
-                value=baselineV || student.baseline[0])
+      br
 
-        dd
-          label(for="studentBaselineMath") Math
-          input(type="number"
-                id="studentBaselineMath"
-                name="studentBaselineMath"
-                placeholder=500
-                value=studentBaselineMath || student.baseline[1])
+      dt
+        h2 Enter new baseline:
+      dd
+        label(for="baselineV") SAT: 
+        input(type="number"
+              id="baselineV"
+              name="baselineV"
+              placeholder="Verbal"
+              value=baselineV || student.baseline[0])
+
+        label(for="baselineM") /
+        input(type="number"
+              id="baselineM"
+              name="baselineM"
+              placeholder="Math"
+              value=baselineM || student.baseline[1])
+
+      dd
+        label(for="baselineE") ACT: 
+        input(type="number"
+              id="baselineE"
+              name="baselineE"
+              placeholder="English"
+              value=baselineE || student.baselineE)
+
+        label(for="baselineACTm") /
+        input(type="number"
+              id="baselineACTm"
+              name="baselineACTm"
+              placeholder="Math"
+              value=baselineACTm || student.baselineACTm)
+
+        label(for="baselineR") /
+        input(type="number"
+              id="baselineR"
+              name="baselineR"
+              placeholder="Reading"
+              value=baselineR || student.baselineR)
+
+        label(for="baselineS") /
+        input(type="number"
+              id="baselineS"
+              name="baselineS"
+              placeholder="Science"
+              value=baselineS || student.baselineS)
+
+      br
+      dt
+        h2 Enter new test plan:
+      dd
+        label(for="SAT") SAT 
+        input(type="radio" id="SAT" name="testPlan" value="SAT" || student.testPlan required=true)
+
+      dd
+        label(for="ACT") ACT
+        input(type="radio" id="ACT" name="testPlan" value="ACT" || student.testPlan required=true)
+      br
+
 
     fieldset.actions
       input(type="submit" value="Save")

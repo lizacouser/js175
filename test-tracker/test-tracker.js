@@ -107,38 +107,82 @@ app.post("/students",
 
   [
     body("baselineV")
-      .notEmpty()
-      .withMessage("The baseline verbal score is required.")
-      .bail()
+      .optional({ checkFalsy: true })
       .isInt({ min: 400, max: 800 })
-      .withMessage(`Baseline verbal score must be between 400 and 800.`)
+      .withMessage(`SAT Verbal score must be between 400 and 800.`)
   ],
 
   [
     body("baselineM")
-      .notEmpty()
-      .withMessage("The baseline math score is required.")
-      .bail()
+      .optional({ checkFalsy: true })
       .isInt({ min: 400, max: 800 })
-      .withMessage(`Baseline math score must be between 400 and 800.`)
+      .withMessage(`SAT Math score must be between 400 and 800.`)
   ],
+
+  [
+    body("baselineE")
+      .optional({ checkFalsy: true })
+      .isInt({ min: 1, max: 36 })
+      .withMessage(`ACT English score must be between 1 and 36.`)
+  ],
+
+  [
+    body("baselineACTm")
+      .optional({ checkFalsy: true })
+      .isInt({ min: 1, max: 36 })
+      .withMessage(`ACT Math score must be between 1 and 36.`)
+  ],
+
+  [
+    body("baselineR")
+      .optional({ checkFalsy: true })
+      .isInt({ min: 1, max: 36 })
+      .withMessage(`ACT Reading score must be between 1 and 36.`)
+  ],
+
+  [
+    body("baselineS")
+      .optional({ checkFalsy: true })
+      .isInt({ min: 1, max: 36 })
+      .withMessage(`ACT Science score must be between 1 and 36.`)
+  ],
+
 
   (req, res) => {
     let errors = validationResult(req);
     if (!errors.isEmpty()) {
       errors.array().forEach(message => req.flash("error", message.msg));
       res.render("new-student", {
-        flash: req.flash(), studentName: req.body.studentName,
+        flash: req.flash(),
+        studentName: req.body.studentName,
         baselineV: req.body.baselineV,
-        baselineM: req.body.baselineM
+        baselineM: req.body.baselineM,
+        baselineE: req.body.baselineV,
+        baselineACTm: req.body.baselineACTm,
+        baselineR: req.body.baselineR,
+        baselineS: req.body.baselineS,
+        testPlan: req.body.testPlan,
       });
     } else {
-      let baseline = [
-        +req.body.baselineV,
-        +req.body.baselineM
-      ];
+      let baseline = [];
+      if (req.body.baselineV && req.body.baselineM) {
+        baseline = [+req.body.baselineV, +req.body.baselineM];
+      } else if (
+        req.body.baselineE &&
+        req.body.baselineACTm &&
+        req.body.baselineR &&
+        req.body.baselineS
+      ) {
+        baseline = [
+          +req.body.baselineE,
+          +req.body.baselineACTm,
+          +req.body.baselineR,
+          +req.body.baselineS,
+        ];
+      }
 
-      let student = new Student(req.body.studentName, baseline);
+      // eslint-disable-next-line max-len
+      let student = new Student(req.body.studentName, req.body.testPlan, baseline);
       req.session.students.push(student);
       req.flash("success", "The student has been created.");
       res.redirect(`/students/${student.id}`);
@@ -198,6 +242,7 @@ app.post("/students/:studentId/tests/:testId/toggle",
             student: student,
             tests: sortTests(student.tests),
             showAll: true,
+            flash: req.flash(),
           });
         } else {
           let title = test.title;
@@ -286,7 +331,7 @@ app.post("/students/:studentId/tests", (req, res, next) => {
   if (!student) {
     next(new Error("Not found."));
   } else {
-    let testPacks = Test.PACK_ORDER["SAT"]; // replace with student.plan later
+    let testPacks = Test.PACK_ORDER[student.testPlan];
     let nextIndex = testPacks.indexOf(student.currentTestPack) + 1;
 
     if (nextIndex < testPacks.length) {
@@ -307,7 +352,7 @@ app.post("/students/:studentId/remove_tests", (req, res, next) => {
   if (!student) {
     next(new Error("Not found."));
   } else {
-    let testPacks = Test.PACK_ORDER["SAT"];
+    let testPacks = Test.PACK_ORDER[student.testPlan];
     let currentIndex = testPacks.indexOf(student.currentTestPack);
 
     if (currentIndex > 0) {
