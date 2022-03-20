@@ -221,6 +221,35 @@ app.post("/students/:studentId/tests/:testId/toggle",
       .withMessage(`Math score must be between 400 and 800.`)
   ],
 
+
+  [
+    body("englishScore")
+      .optional({ checkFalsy: true })
+      .isInt({ min: 1, max: 36 })
+      .withMessage(`ACT English score must be between 1 and 36.`)
+  ],
+
+  [
+    body("ACTMathScore")
+      .optional({ checkFalsy: true })
+      .isInt({ min: 1, max: 36 })
+      .withMessage(`ACT Math score must be between 1 and 36.`)
+  ],
+
+  [
+    body("readingScore")
+      .optional({ checkFalsy: true })
+      .isInt({ min: 1, max: 36 })
+      .withMessage(`ACT Reading score must be between 1 and 36.`)
+  ],
+
+  [
+    body("scienceScore")
+      .optional({ checkFalsy: true })
+      .isInt({ min: 1, max: 36 })
+      .withMessage(`ACT Science score must be between 1 and 36.`)
+  ],
+
   // eslint-disable-next-line max-lines-per-function
   // eslint-disable-next-line max-statements
   (req, res, next) => {
@@ -251,8 +280,13 @@ app.post("/students/:studentId/tests/:testId/toggle",
             test.clearScore();
             req.flash("success", `"${title}" marked as NOT done!`);
           } else {
-            test.setScore(req.body.verbalScore, req.body.mathScore,
-              req.body.projected, req.body.mock);
+            let score = test.isSAT() ? [
+              +req.body.verbalScore, +req.body.mathScore
+            ] : [
+              +req.body.englishScore, +req.body.ACTMathScore,
+              +req.body.readingScore, +req.body.scienceScore,
+            ];
+            test.setScore(score, req.body.projected, req.body.mock);
             test.markDone();
             req.flash("success", `"${title}" marked done.`);
           }
@@ -336,7 +370,7 @@ app.post("/students/:studentId/tests", (req, res, next) => {
 
     if (nextIndex < testPacks.length) {
       let nextPack = testPacks[nextIndex];
-      student.addTestPack(nextPack);
+      student.addTestPack(student.testPlan, nextPack);
       req.flash("success", "Test pack has been added.");
     } else {
       req.flash("error", "No more test packs available.");

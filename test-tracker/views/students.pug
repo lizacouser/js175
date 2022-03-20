@@ -13,7 +13,7 @@ block main
             p #{student.allDone().length} / #{student.size()} completed
             - let recentTest = student.mostRecentCompleted()
             if !!recentTest && !!recentTest.getScore()
-              p #{recentTest.getTitle()}: #{recentTest.getScore()}
+              p #{recentTest.getTitle()}: #{recentTest.logScore()}
             p= student.logBaseline()
 
             form.delete(action=`/students/${student.id}/destroy` method="post")

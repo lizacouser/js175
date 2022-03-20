@@ -20,14 +20,14 @@ class Student {
     let firstPack = testPacks[0];
 
     this.tests = [];
-    this.addTestPack(firstPack);
+    this.addTestPack(plan, firstPack);
   }
 
-  addTestPack(packName) {
+  addTestPack(plan, packName) {
     let testList = Test.PACKS[packName];
 
     testList.forEach(testName => {
-      this.tests.push(new Test(testName, packName));
+      this.tests.push(new Test(testName, plan, packName));
     });
 
     this.currentTestPack = packName;
@@ -173,7 +173,7 @@ class Student {
 
   logBaseline() {
     if (Array.isArray(this.baseline)) {
-      let scoreSum = this.baseline.reduce((acc, val) => acc + val);
+      let scoreSum = this.baseline.reduce((acc, val) => +acc + +val);
       if (this.baseline.length === 2) {
         let cumulative = scoreSum;
         return `Baseline: ${this.baseline[0]}V/${this.baseline[1]}M (${cumulative}C)`;

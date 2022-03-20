@@ -28,10 +28,13 @@ block main
       each test in tests
         if student.currentTestPack === test.testPack || showAll
           li(class=test.isDone() ? "done" : "")
+            h3= test.title
+            if test.getScore()
+              p #{test.logScore()}
             form.check(action=`/students/${student.id}/tests/${test.id}/toggle` method="post")
               input(type="hidden" name="done" value=!test.isDone())
               if !test.isDone()
-                if test.testPack.includes("SAT")
+                if test.isSAT()
                   input(type="number"
                       id="verbalScore"
                       name="verbalScore"
@@ -42,7 +45,7 @@ block main
                       name="mathScore"
                       placeholder="math"
                       value=mathScore)
-                else if test.testPack.includes("ACT")
+                else if test.isACT()
                   input(type="number"
                       id="englishScore"
                       name="englishScore"
@@ -70,14 +73,6 @@ block main
               button Done
             br
             br
-            h3= test.title
-            if test.getScore()
-              if test.isMock
-                p MOCK
-              if test.isProjectedScore
-                p *#{test.logScore()}
-              else
-                p= test.logScore() 
 
     form(action=`/students/${student.id}/tests` method="post")
       fieldset.actions

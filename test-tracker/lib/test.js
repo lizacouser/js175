@@ -38,11 +38,20 @@ class Test {
     "ACT Mocks": ["ACT 39", "ACT 32 (Backup)", "ACT 46 (Backup)"],
   };
 
-  constructor(title, testPack) {
+  constructor(title, plan, testPack) {
     this.id = nextId();
     this.title = title;
     this.done = false;
     this.testPack = testPack;
+    this.plan = plan;
+  }
+
+  isACT() {
+    return this.plan === "ACT";
+  }
+
+  isSAT() {
+    return this.plan === "SAT";
   }
 
   toString() {
@@ -71,12 +80,15 @@ class Test {
     this.title = title;
   }
 
-  setScore(verbal, math, projected, mock) {
-    if (this.isValidScore(+verbal, +math)) {
-      this.score = [+verbal, +math];
-      this.isProjectedScore = projected;
-      this.isMock = mock;
-    }
+  setScore(score, projected, mock) {
+    // if (this.isValidScore(score)) {
+    //   this.score = score;
+    //   this.isProjected = projected;
+    //   this.isMock = mock;
+    // }
+    this.score = score;
+    this.isProjected = projected;
+    this.isMock = mock;
   }
 
   clearScore() {
@@ -85,11 +97,22 @@ class Test {
     this.mock = null;
   }
 
-  isValidScore(verbal, math) {
-    let isInt = Number.isInteger(verbal) && Number.isInteger(math);
-    let aboveMin = verbal >= Test.MIN_SAT_SCORE && math >= Test.MIN_SAT_SCORE;
-    return isInt && aboveMin;
-  }
+  // isValidScore() {
+  //   let isNonZeroArray = (Array.isArray(this.score) || this.score.length !== 0);
+  //   let allIntegers = this.score.every(sectionScore => {
+  //     return Number.isInt(sectionScore);
+  //   });
+
+  //   let inRange = this.score.every(sectionScore => {
+  //     return this.isSAT() ?
+  //       sectionScore >= Test.MIN_SAT_SCORE &&
+  //       sectionScore >= Test.MAX_SAT_SCORE :
+  //       sectionScore >= Test.MIN_ACT_SCORE &&
+  //       sectionScore >= Test.MAX_ACT_SCORE;
+  //   });
+
+  //   return isNonZeroArray && allIntegers && inRange;
+  // }
 
   getScore() {
     return this.score;
@@ -99,20 +122,41 @@ class Test {
     return this.title;
   }
 
-  logScore() {
-    if (Array.isArray(this.score)) {
-      let scoreSum = this.baseline.reduce((acc, val) => Number(acc) + Number(val));
-
-      if (this.testPack.includes("SAT")) {
-        let cumulative = scoreSum;
-        return `Score: ${this.score[0]}V/${this.score[1]}M (${cumulative}C)`;
-
-      } else if (this.testPack.includes("ACT")) {
-        let cumulative = Math.round(scoreSum / this.baseline.length);
-        return `Score: ${this.score[0]}E/${this.score[1]}M/${this.score[2]}R/${this.score[3]}S (${cumulative}C)`;
-      }
+  getCumulativeScore() {
+    let scoreSum = this.score.reduce((acc, val) => acc + val);
+    if (this.isSAT()) {
+      return scoreSum;
+    } else if (this.isACT()) {
+      return Math.round(scoreSum / this.score.length);
+    } else {
+      return null;
     }
-    return `No Score`;
+  }
+
+  // eslint-disable-next-line max-lines-per-function
+  logScore() {
+    let scoreString = "";
+    if (Array.isArray(this.score)) {
+      // eslint-disable-next-line max-len
+      let starIfProj = (this.isProjected ? "*" : "");
+
+      if (this.isMock) {
+        scoreString += "MOCK ";
+      }
+
+      if (this.isSAT()) {
+        scoreString += `${starIfProj}${this.score[0]}V/${starIfProj}${this.score[1]}M`;
+      }
+
+      if (this.isACT()) {
+        scoreString += `${starIfProj}${this.score[0]}E/${starIfProj}${this.score[1]}M/${starIfProj}${this.score[2]}R/${starIfProj}${this.score[3]}S`;
+      }
+
+      scoreString += ` (${starIfProj}${this.getCumulativeScore()}C)`;
+    } else {
+      scoreString += `No Score`;
+    }
+    return scoreString;
   }
 
   static makeTest(rawTest) {
