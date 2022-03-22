@@ -14,7 +14,7 @@ block main
             - let recentTest = student.mostRecentCompleted()
             if !!recentTest && !!recentTest.getScore()
               p #{recentTest.getTitle()}: #{recentTest.logScore()}
-            p= student.logBaseline()
+            p Baseline: #{student.baseline.logScore()}
 
             form.delete(action=`/students/${student.id}/destroy` method="post")
               button Delete

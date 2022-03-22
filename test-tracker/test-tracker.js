@@ -183,6 +183,7 @@ app.post("/students",
 
       // eslint-disable-next-line max-len
       let student = new Student(req.body.studentName, req.body.testPlan, baseline);
+      student.setBaseline(baseline);
       req.session.students.push(student);
       req.flash("success", "The student has been created.");
       res.redirect(`/students/${student.id}`);
@@ -443,23 +444,49 @@ app.post("/students/:studentId/edit",
   ],
 
   [
-    body("baselineV")
-      .notEmpty()
-      .withMessage("The baseline verbal score is required.")
-      .bail()
+    body("verbalScore")
+      .optional({ checkFalsy: true })
       .isInt({ min: 400, max: 800 })
-      .withMessage(`Baseline verbal score must be between 400 and 800.`)
+      .withMessage(`Verbal score must be between 400 and 800.`)
   ],
 
   [
-    body("baselineM")
-      .notEmpty()
-      .withMessage("The baseline math score is required.")
-      .bail()
+    body("mathScore")
+      .optional({ checkFalsy: true })
       .isInt({ min: 400, max: 800 })
-      .withMessage(`Baseline math score must be between 400 and 800.`)
+      .withMessage(`Math score must be between 400 and 800.`)
   ],
 
+
+  [
+    body("baselineE")
+      .optional({ checkFalsy: true })
+      .isInt({ min: 1, max: 36 })
+      .withMessage(`ACT English score must be between 1 and 36.`)
+  ],
+
+  [
+    body("baselineACTm")
+      .optional({ checkFalsy: true })
+      .isInt({ min: 1, max: 36 })
+      .withMessage(`ACT Math score must be between 1 and 36.`)
+  ],
+
+  [
+    body("baselineR")
+      .optional({ checkFalsy: true })
+      .isInt({ min: 1, max: 36 })
+      .withMessage(`ACT Reading score must be between 1 and 36.`)
+  ],
+
+  [
+    body("baselineS")
+      .optional({ checkFalsy: true })
+      .isInt({ min: 1, max: 36 })
+      .withMessage(`ACT Science score must be between 1 and 36.`)
+  ],
+
+  // eslint-disable-next-line max-statements
   (req, res, next) => {
     let studentId = req.params.studentId;
     let student = loadStudent(+studentId, req.session.students);
@@ -472,8 +499,24 @@ app.post("/students/:studentId/edit",
 
         res.render("edit-list", {flash: req.flash(), studentName: req.body.studentName, student: student, baselineV: req.body.baselineV, baselineM: req.body.baselineM});
       } else {
+        let baseline = [];
+        if (req.body.baselineV && req.body.baselineM) {
+          baseline = [+req.body.baselineV, +req.body.baselineM];
+        } else if (
+          req.body.baselineE &&
+          req.body.baselineACTm &&
+          req.body.baselineR &&
+          req.body.baselineS
+        ) {
+          baseline = [
+            +req.body.baselineE,
+            +req.body.baselineACTm,
+            +req.body.baselineR,
+            +req.body.baselineS,
+          ];
+        }
         student.setName(req.body.studentName);
-        student.setBaseline([req.body.baselineV, req.body.baselineM]);
+        student.setBaseline(baseline);
         student.setTestPlan(req.body.testPlan);
         req.flash("success", "Student updated.");
         res.redirect(`/students/${studentId}`);

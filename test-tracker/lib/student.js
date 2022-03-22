@@ -3,12 +3,11 @@ const Test = require("./test");
 
 
 class Student {
-  constructor(name, testPlan, baseline) {
+  constructor(name, testPlan) {
     this.id = nextId();
     this.name = name;
     this.testPlan = testPlan;
     this.createFirstPack(testPlan);
-    this.baseline = baseline;
   }
 
   setTestPlan(plan) {
@@ -109,7 +108,7 @@ class Student {
   }
 
   filter(callback) {
-    let newStudent = new Student(this.name, this.testPlan, this.baseline);
+    let newStudent = new Student(this.name, this.testPlan/*, this.baseline*/);
     this.tests.forEach(test => {
       if (callback(test)) {
         newStudent.add(test);
@@ -167,31 +166,22 @@ class Student {
     this.name = name;
   }
 
-  setBaseline(baseline) {
-    this.baseline = baseline;
-  }
-
-  logBaseline() {
-    if (Array.isArray(this.baseline)) {
-      let scoreSum = this.baseline.reduce((acc, val) => +acc + +val);
-      if (this.baseline.length === 2) {
-        let cumulative = scoreSum;
-        return `Baseline: ${this.baseline[0]}V/${this.baseline[1]}M (${cumulative}C)`;
-      } else if (this.baseline.length === 4) {
-        let cumulative = Math.round(scoreSum / this.baseline.length);
-        return `Baseline: ${this.baseline[0]}E/${this.baseline[1]}M/${this.baseline[2]}R/${this.baseline[3]}S (${cumulative}C)`;
-      }
+  setBaseline(baselineScore) {
+    if (baselineScore.length === 2) {
+      this.baseline = new Test("Baseline", "SAT");
+      this.baseline.setScore(baselineScore);
+    } else if (baselineScore.length === 4) {
+      this.baseline = new Test("Baseline", "ACT");
+      this.baseline.setScore(baselineScore);
     }
-    return `No Baseline`;
   }
 
   static makeStudent(rawStudent) {
     // eslint-disable-next-line max-len
-    let student = Object.assign(new Student(rawStudent.name, rawStudent.testPlan, rawStudent.baseline), {
+    let student = Object.assign(new Student(rawStudent.name, rawStudent.testPlan), {
       id: rawStudent.id,
-      // name: rawStudent.name,
-      // baseline: rawStudent.baseline,
       tests: [],
+      baseline: Test.makeTest(rawStudent.baseline),
       currentTestPack: rawStudent.currentTestPack,
       // testPlan: rawStudent.testPlan,
     });
