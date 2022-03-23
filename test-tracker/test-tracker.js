@@ -8,6 +8,7 @@ const Student = require("./lib/student");
 const Test = require("./lib/test");
 const { sortStudents, sortTests } = require("./lib/sort");
 const store = require("connect-loki");
+const validate = require("./lib/validator");
 
 const app = express();
 const host = "localhost";
@@ -91,62 +92,14 @@ app.get("/students/new", (_req, res) => {
 // Create a new todo list
 app.post("/students",
   [
-    body("studentName")
-      .trim()
-      .isLength({ min: 1 })
-      .withMessage("Student Name is required.")
-      .isLength({ max: 100 })
-      .withMessage("Name must be between 1 and 100 characters.")
-      .custom((name, { req }) => {
-        let students = req.session.students;
-        let duplicate = students.find(student => student.name === name);
-        return duplicate === undefined;
-      })
-      .withMessage("Student name must be unique."),
+    validate.name,
+    validate.baselineV,
+    validate.baselineM,
+    validate.baselineE,
+    validate.baselineACTm,
+    validate.baselineR,
+    validate.baselineS,
   ],
-
-  [
-    body("baselineV")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 400, max: 800 })
-      .withMessage(`SAT Verbal score must be between 400 and 800.`)
-  ],
-
-  [
-    body("baselineM")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 400, max: 800 })
-      .withMessage(`SAT Math score must be between 400 and 800.`)
-  ],
-
-  [
-    body("baselineE")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 1, max: 36 })
-      .withMessage(`ACT English score must be between 1 and 36.`)
-  ],
-
-  [
-    body("baselineACTm")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 1, max: 36 })
-      .withMessage(`ACT Math score must be between 1 and 36.`)
-  ],
-
-  [
-    body("baselineR")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 1, max: 36 })
-      .withMessage(`ACT Reading score must be between 1 and 36.`)
-  ],
-
-  [
-    body("baselineS")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 1, max: 36 })
-      .withMessage(`ACT Science score must be between 1 and 36.`)
-  ],
-
 
   (req, res) => {
     let errors = validationResult(req);
