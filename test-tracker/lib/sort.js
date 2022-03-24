@@ -15,11 +15,6 @@ const compareByTitle = (itemA, itemB) => {
 module.exports = {
   sortStudents(students) {
     return students.filter(student => student.name).sort(compareByTitle);
-    // let undone = students.filter(student => !student.isDone());
-    // let done = students.filter(student => student.isDone());
-    // undone.sort(compareByTitle);
-    // done.sort(compareByTitle);
-    // return [].concat(undone, done);
   },
 
   sortTests(tests) {

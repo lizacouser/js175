@@ -9,10 +9,6 @@ const Test = require("./lib/test");
 const { sortStudents, sortTests } = require("./lib/sort");
 const store = require("connect-loki");
 const validate = require("./lib/validator");
-// const MAX_SAT_SCORE = 800;
-// const MIN_SAT_SCORE = 400;
-// const MAX_ACT_SCORE = 36;
-// const MIN_ACT_SCORE = 1;
 
 const app = express();
 const host = "localhost";
@@ -66,9 +62,8 @@ const loadStudent = (studentId, students) => {
   return students.find(student => student.id === studentId);
 };
 
-// Find a todo with the indicated ID in the indicated todo list. Returns
-// `undefined` if not found. Note that both `todoListId` and `todoId` must be
-// numeric.
+// Find a test with the indicated ID in the indicated student. Returns
+// `undefined` if not found.
 const loadTest = (studentId, testId, students) => {
   let student = loadStudent(studentId, students);
   if (!student) return undefined;

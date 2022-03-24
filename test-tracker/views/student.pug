@@ -30,7 +30,7 @@ block main
           li(class=test.isDone() ? "done" : "")
             h3= test.title
             if test.getScore()
-              p #{test.logScore()}
+              p= test.getScore().toString()
             form.check(action=`/students/${student.id}/tests/${test.id}/toggle` method="post")
               input(type="hidden" name="done" value=!test.isDone())
               if !test.isDone()

@@ -187,7 +187,6 @@ class Student {
       tests: [],
       baseline: Test.makeTest(rawStudent.baseline),
       currentTestPack: rawStudent.currentTestPack,
-      // testPlan: rawStudent.testPlan,
     });
     if (rawStudent.tests) {
       rawStudent.tests.forEach(test => student.add(Test.makeTest(test)));

@@ -41,17 +41,29 @@ class SATScore extends Score {
     return this.verbal + this.math;
   }
 
-  logScore() {
-    let starIfProj = (this.isProjected() ? "*" : "");
-    let scoreString = "";
+  toString() {
+    let starProjected = (this.isProjected() ? "*" : "");
+    let mock = (this.isMock() ? "MOCK" : "");
+    let scoreArray = [];
+    let cumulative = "";
 
-    if (this.isMock()) {
-      scoreString += "MOCK ";
+    if (this.verbal) {
+      scoreArray.push(`${starProjected}${this.verbal}V`);
     }
-    scoreString += `${starIfProj}${this.score[0]}V/${starIfProj}${this.score[1]}M`;
-    scoreString += ` (${starIfProj}${this.getCumulativeScore()}C)`;
 
-    return scoreString;
+    if (this.math) {
+      scoreArray.push(`${starProjected}${this.math}M`);
+    }
+
+    if (scoreArray.length === 0) {
+      return "No Score";
+    }
+
+    if (scoreArray.length === 2) {
+      cumulative = `(${starProjected}${this.getCumulativeScore(scoreArray.length)}C)`;
+    }
+
+    return `${mock} ${scoreArray.join("/")} ${cumulative}`;
   }
 
   static makeSATScore(rawSATScore) {
@@ -63,33 +75,54 @@ class ACTScore extends Score {
   static MAX_ACT_SCORE = 36;
   static MIN_SAT_SCORE = 1;
 
-  constructor(english, math, reading, science, isProjected, isMock) {
-    super("ACT", isProjected, isMock);
+  constructor(english, math, reading, science, projected, mock) {
+    super("ACT", projected, mock);
     this.english = english;
-    this.math = math;
+    this.ACTMath = math;
     this.reading = reading;
     this.science = science;
   }
 
-  getCumulativeScore() {
-    let numSections = 4;
-    let scoreSum = this.english + this.math + this.reading + this.science;
+  getCumulativeScore(numSections) {
+    // eslint-disable-next-line max-len
+    let scoreSum = this.english + this.ACTMath + this.reading + this.science;
     return Math.round(scoreSum / numSections);
   }
 
-  // eslint-disable-next-line max-lines-per-function
-  logScore() {
-    let scoreString = "";
-    let starIfProj = (this.isProjected() ? "*" : "");
 
-    if (this.isMock()) {
-      scoreString += "MOCK ";
+  // eslint-disable-next-line max-lines-per-function
+  // eslint-disable-next-line max-statements
+  toString() {
+    let starProjected = (this.isProjected() ? "*" : "");
+    let mock = (this.isMock() ? "MOCK" : "");
+    let scoreArray = [];
+    let cumulative = "";
+
+    if (this.english) {
+      scoreArray.push(`${starProjected}${this.english}E`);
     }
 
-    scoreString += `${starIfProj}${this.english}E/${starIfProj}${this.math}M/${starIfProj}${this.reading}R/${starIfProj}${this.science}S`;
+    if (this.ACTMath) {
+      scoreArray.push(`${starProjected}${this.ACTMath}M`);
+    }
 
-    scoreString += ` (${starIfProj}${this.getCumulativeScore()}C)`;
-    return scoreString;
+    if (this.reading) {
+      scoreArray.push(`${starProjected}${this.reading}R`);
+    }
+
+    if (this.science) {
+      scoreArray.push(`${starProjected}${this.science}S`);
+    }
+
+    if (scoreArray.length === 0) {
+      return "No Score";
+    }
+
+    if (scoreArray.length === 4) {
+      cumulative = `(${starProjected}${this.getCumulativeScore(scoreArray.length)}C)`;
+    }
+
+    return `${mock} ${scoreArray.join("/")} ${cumulative}`;
   }
 
   static makeACTScore(rawACTScore) {
