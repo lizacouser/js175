@@ -1,9 +1,6 @@
 const nextId = require("./next-id");
 
 class Test {
-  static MAX_SAT_SCORE = 800;
-  static MIN_SAT_SCORE = 400;
-
   static PACK_ORDER = {
     SAT: ["2020 SAT Blue Book", "SAT Pack A", "SAT Pack B", "SAT Mocks"],
     ACT: ["21-22 ACT Red Book", "ACT Pack A", "ACT Pack B", "ACT Mocks"]

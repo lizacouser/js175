@@ -25,48 +25,48 @@ block main
       dt
         h2 Enter new baseline:
       dd
-        label(for="baselineV") SAT: 
+        label(for="SATVerbal") SAT: 
         input(type="number"
-              id="baselineV"
-              name="baselineV"
+              id="SATVerbal"
+              name="SATVerbal"
               placeholder="Verbal"
-              value=baselineV || student.baseline[0])
+              value=SATVerbal || student.getBaseline().getScore()[0])
 
-        label(for="baselineM") /
+        label(for="SATMath") /
         input(type="number"
-              id="baselineM"
-              name="baselineM"
+              id="SATMath"
+              name="SATMath"
               placeholder="Math"
-              value=baselineM || student.baseline[1])
+              value=SATMath || student.getBaseline().getScore()[1])
 
       dd
-        label(for="baselineE") ACT: 
+        label(for="ACTEnglish") ACT: 
         input(type="number"
-              id="baselineE"
-              name="baselineE"
+              id="ACTEnglish"
+              name="ACTEnglish"
               placeholder="English"
-              value=baselineE || student.baselineE)
+              value=ACTEnglish || student.getBaseline().getScore()[0])
 
-        label(for="baselineACTm") /
+        label(for="ACTMath") /
         input(type="number"
-              id="baselineACTm"
-              name="baselineACTm"
+              id="ACTMath"
+              name="ACTMath"
               placeholder="Math"
-              value=baselineACTm || student.baselineACTm)
+              value=ACTMath || student.getBaseline().getScore()[1])
 
-        label(for="baselineR") /
+        label(for="ACTReading") /
         input(type="number"
-              id="baselineR"
-              name="baselineR"
+              id="ACTReading"
+              name="ACTReading"
               placeholder="Reading"
-              value=baselineR || student.baselineR)
+              value=ACTReading || student.getBaseline().getScore()[2])
 
-        label(for="baselineS") /
+        label(for="ACTScience") /
         input(type="number"
-              id="baselineS"
-              name="baselineS"
+              id="ACTScience"
+              name="ACTScience"
               placeholder="Science"
-              value=baselineS || student.baselineS)
+              value=ACTScience || student.getBaseline().getScore()[3])
 
       br
       dt

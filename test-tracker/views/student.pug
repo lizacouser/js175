@@ -36,36 +36,36 @@ block main
               if !test.isDone()
                 if test.isSAT()
                   input(type="number"
-                      id="verbalScore"
-                      name="verbalScore"
+                      id="SATVerbal"
+                      name="SATVerbal"
                       placeholder="verbal"
-                      value=verbalScore)
+                      value=SATVerbal)
                   input(type="number"
-                      id="mathScore"
-                      name="mathScore"
+                      id="SATMath"
+                      name="SATMath"
                       placeholder="math"
-                      value=mathScore)
+                      value=SATMath)
                 else if test.isACT()
                   input(type="number"
-                      id="englishScore"
-                      name="englishScore"
+                      id="ACTEnglish"
+                      name="ACTEnglish"
                       placeholder="english"
-                      value=englishScore)
+                      value=ACTEnglish)
                   input(type="number"
-                      id="ACTMathScore"
-                      name="ACTMathScore"
+                      id="ACTMath"
+                      name="ACTMath"
                       placeholder="math"
-                      value=ACTMathScore)
+                      value=ACTMath)
                   input(type="number"
-                      id="readingScore"
-                      name="readingScore"
+                      id="ACTReading"
+                      name="ACTReading"
                       placeholder="reading"
-                      value=readingScore)
+                      value=ACTReading)
                   input(type="number"
-                      id="scienceScore"
-                      name="scienceScore"
+                      id="ACTScience"
+                      name="ACTScience"
                       placeholder="science"
-                      value=scienceScore)
+                      value=ACTScience)
                 input(type="checkbox" id="projected" name="projected" value="Projected")
                 label(for="projected") Projected 
                 input(type="checkbox" id="mock" name="mock" value="Mock")

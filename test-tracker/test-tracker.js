@@ -9,6 +9,10 @@ const Test = require("./lib/test");
 const { sortStudents, sortTests } = require("./lib/sort");
 const store = require("connect-loki");
 const validate = require("./lib/validator");
+// const MAX_SAT_SCORE = 800;
+// const MIN_SAT_SCORE = 400;
+// const MAX_ACT_SCORE = 36;
+// const MIN_ACT_SCORE = 1;
 
 const app = express();
 const host = "localhost";
@@ -92,13 +96,9 @@ app.get("/students/new", (_req, res) => {
 // Create a new todo list
 app.post("/students",
   [
-    validate.name,
-    validate.baselineV,
-    validate.baselineM,
-    validate.baselineE,
-    validate.baselineACTm,
-    validate.baselineR,
-    validate.baselineS,
+    validate.uniqueName,
+    validate.SATScore,
+    validate.ACTScore,
   ],
 
   (req, res) => {
@@ -108,29 +108,29 @@ app.post("/students",
       res.render("new-student", {
         flash: req.flash(),
         studentName: req.body.studentName,
-        baselineV: req.body.baselineV,
-        baselineM: req.body.baselineM,
-        baselineE: req.body.baselineV,
-        baselineACTm: req.body.baselineACTm,
-        baselineR: req.body.baselineR,
-        baselineS: req.body.baselineS,
+        SATVerbal: req.body.SATVerbal,
+        SATMath: req.body.SATMath,
+        ACTEnglish: req.body.ACTEnglish,
+        ACTMath: req.body.ACTMath,
+        ACTReading: req.body.ACTReading,
+        ACTScience: req.body.ACTScience,
         testPlan: req.body.testPlan,
       });
     } else {
       let baseline = [];
-      if (req.body.baselineV && req.body.baselineM) {
-        baseline = [+req.body.baselineV, +req.body.baselineM];
+      if (req.body.SATVerbal && req.body.SATMath) {
+        baseline = [+req.body.SATVerbal, +req.body.SATMath];
       } else if (
-        req.body.baselineE &&
-        req.body.baselineACTm &&
-        req.body.baselineR &&
-        req.body.baselineS
+        req.body.ACTEnglish &&
+        req.body.ACTMath &&
+        req.body.ACTReading &&
+        req.body.ACTScience
       ) {
         baseline = [
-          +req.body.baselineE,
-          +req.body.baselineACTm,
-          +req.body.baselineR,
-          +req.body.baselineS,
+          +req.body.ACTEnglish,
+          +req.body.ACTMath,
+          +req.body.ACTReading,
+          +req.body.ACTScience,
         ];
       }
 
@@ -162,46 +162,8 @@ app.get("/students/:studentId", (req, res, next) => {
 // Toggle completion status of a todo
 app.post("/students/:studentId/tests/:testId/toggle",
   [
-    body("verbalScore")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 400, max: 800 })
-      .withMessage(`Verbal score must be between 400 and 800.`)
-  ],
-
-  [
-    body("mathScore")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 400, max: 800 })
-      .withMessage(`Math score must be between 400 and 800.`)
-  ],
-
-
-  [
-    body("englishScore")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 1, max: 36 })
-      .withMessage(`ACT English score must be between 1 and 36.`)
-  ],
-
-  [
-    body("ACTMathScore")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 1, max: 36 })
-      .withMessage(`ACT Math score must be between 1 and 36.`)
-  ],
-
-  [
-    body("readingScore")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 1, max: 36 })
-      .withMessage(`ACT Reading score must be between 1 and 36.`)
-  ],
-
-  [
-    body("scienceScore")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 1, max: 36 })
-      .withMessage(`ACT Science score must be between 1 and 36.`)
+    validate.SATScore,
+    validate.ACTScore,
   ],
 
   // eslint-disable-next-line max-lines-per-function
@@ -235,10 +197,10 @@ app.post("/students/:studentId/tests/:testId/toggle",
             req.flash("success", `"${title}" marked as NOT done!`);
           } else {
             let score = test.isSAT() ? [
-              +req.body.verbalScore, +req.body.mathScore
+              +req.body.SATVerbal, +req.body.SATMath
             ] : [
-              +req.body.englishScore, +req.body.ACTMathScore,
-              +req.body.readingScore, +req.body.scienceScore,
+              +req.body.ACTEnglish, +req.body.ACTMath,
+              +req.body.ACTReading, +req.body.ACTScience,
             ];
             test.setScore(score, req.body.projected, req.body.mock);
             test.markDone();
@@ -379,64 +341,12 @@ app.post("/students/:studentId/destroy", (req, res, next) => {
   }
 });
 
-// Edit todo list title
+// Edit student
 app.post("/students/:studentId/edit",
   [
-    body("studentName")
-      .trim()
-      .isLength({ min: 1 })
-      .withMessage("The student name is required.")
-      .isLength({ max: 100 })
-      .withMessage("Student name must be between 1 and 100 characters.")
-      .custom((title, { req }) => {
-        let students = req.session.students;
-        let duplicate = students.find(student => student.title === title);
-        return duplicate === undefined;
-      })
-      .withMessage("Student name must be unique."),
-  ],
-
-  [
-    body("verbalScore")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 400, max: 800 })
-      .withMessage(`Verbal score must be between 400 and 800.`)
-  ],
-
-  [
-    body("mathScore")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 400, max: 800 })
-      .withMessage(`Math score must be between 400 and 800.`)
-  ],
-
-
-  [
-    body("baselineE")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 1, max: 36 })
-      .withMessage(`ACT English score must be between 1 and 36.`)
-  ],
-
-  [
-    body("baselineACTm")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 1, max: 36 })
-      .withMessage(`ACT Math score must be between 1 and 36.`)
-  ],
-
-  [
-    body("baselineR")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 1, max: 36 })
-      .withMessage(`ACT Reading score must be between 1 and 36.`)
-  ],
-
-  [
-    body("baselineS")
-      .optional({ checkFalsy: true })
-      .isInt({ min: 1, max: 36 })
-      .withMessage(`ACT Science score must be between 1 and 36.`)
+    validate.name,
+    validate.SATScore,
+    validate.ACTScore,
   ],
 
   // eslint-disable-next-line max-statements
@@ -450,22 +360,22 @@ app.post("/students/:studentId/edit",
       if (!errors.isEmpty()) {
         errors.array().forEach(message => req.flash("error", message.msg));
 
-        res.render("edit-list", {flash: req.flash(), studentName: req.body.studentName, student: student, baselineV: req.body.baselineV, baselineM: req.body.baselineM});
+        res.render("edit-list", {flash: req.flash(), studentName: req.body.studentName, student: student, SATVerbal: req.body.SATVerbal, SATMath: req.body.SATMath});
       } else {
         let baseline = [];
-        if (req.body.baselineV && req.body.baselineM) {
-          baseline = [+req.body.baselineV, +req.body.baselineM];
+        if (req.body.SATVerbal && req.body.SATMath) {
+          baseline = [+req.body.SATVerbal, +req.body.SATMath];
         } else if (
-          req.body.baselineE &&
-          req.body.baselineACTm &&
-          req.body.baselineR &&
-          req.body.baselineS
+          req.body.ACTEnglish &&
+          req.body.ACTMath &&
+          req.body.ACTReading &&
+          req.body.ACTScience
         ) {
           baseline = [
-            +req.body.baselineE,
-            +req.body.baselineACTm,
-            +req.body.baselineR,
-            +req.body.baselineS,
+            +req.body.ACTEnglish,
+            +req.body.ACTMath,
+            +req.body.ACTReading,
+            +req.body.ACTScience,
           ];
         }
         student.setName(req.body.studentName);

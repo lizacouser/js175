@@ -166,6 +166,10 @@ class Student {
     this.name = name;
   }
 
+  getBaseline() {
+    return this.baseline;
+  }
+
   setBaseline(baselineScore) {
     if (baselineScore.length === 2) {
       this.baseline = new Test("Baseline", "SAT");
