@@ -3,6 +3,7 @@ class Score {
     this.test = testType;
     this.projected = projected;
     this.mock = mock;
+    this.scoreArray = [];
   }
 
   isACTScore() {
@@ -21,6 +22,12 @@ class Score {
     return this.mock;
   }
 
+  isEmpty() {
+    return this.scoreArray.every(sectionScore => {
+      return !sectionScore;
+    });
+  }
+
   static makeScore(rawScore) {
     return Object.assign(new Score(), rawScore);
   }
@@ -35,6 +42,7 @@ class SATScore extends Score {
     super("SAT", projected, mock);
     this.verbal = verbal;
     this.math = math;
+    this.scoreArray = [verbal, math];
   }
 
   getCumulativeScore() {
@@ -55,12 +63,12 @@ class SATScore extends Score {
       scoreArray.push(`${starProjected}${this.math}M`);
     }
 
-    if (scoreArray.length === 0) {
-      return "No Score";
-    }
-
     if (scoreArray.length === 2) {
       cumulative = `(${starProjected}${this.getCumulativeScore(scoreArray.length)}C)`;
+    }
+
+    if (scoreArray.length === 0) {
+      return "No Score";
     }
 
     return `${mock} ${scoreArray.join("/")} ${cumulative}`;
@@ -81,45 +89,36 @@ class ACTScore extends Score {
     this.ACTMath = math;
     this.reading = reading;
     this.science = science;
+    this.scoreArray = [english, math, reading, science];
   }
 
   getCumulativeScore(numSections) {
-    // eslint-disable-next-line max-len
     let scoreSum = this.english + this.ACTMath + this.reading + this.science;
     return Math.round(scoreSum / numSections);
   }
 
 
-  // eslint-disable-next-line max-lines-per-function
-  // eslint-disable-next-line max-statements
   toString() {
     let starProjected = (this.isProjected() ? "*" : "");
     let mock = (this.isMock() ? "MOCK" : "");
     let scoreArray = [];
     let cumulative = "";
 
-    if (this.english) {
-      scoreArray.push(`${starProjected}${this.english}E`);
-    }
+    let sections = [[this.english, "E"], [this.ACTMath, "M"], [this.reading, "R"], [this.science, "S"]];
 
-    if (this.ACTMath) {
-      scoreArray.push(`${starProjected}${this.ACTMath}M`);
-    }
+    sections.forEach(sectionArray => {
+      let [section, label] = sectionArray;
+      if (section) {
+        scoreArray.push(`${starProjected}${section}${label}`);
+      }
+    });
 
-    if (this.reading) {
-      scoreArray.push(`${starProjected}${this.reading}R`);
-    }
-
-    if (this.science) {
-      scoreArray.push(`${starProjected}${this.science}S`);
+    if (scoreArray.length === 4) {
+      cumulative = `(${starProjected}${this.getCumulativeScore(scoreArray.length)}C)`;
     }
 
     if (scoreArray.length === 0) {
       return "No Score";
-    }
-
-    if (scoreArray.length === 4) {
-      cumulative = `(${starProjected}${this.getCumulativeScore(scoreArray.length)}C)`;
     }
 
     return `${mock} ${scoreArray.join("/")} ${cumulative}`;

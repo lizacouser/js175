@@ -30,16 +30,14 @@ block main
               id="SATVerbal"
               name="SATVerbal"
               placeholder="Verbal"
-              value=SATVerbal || student.getBaseline().getScore().verbal)
-              //- value=SATVerbal || student.getBaseline().getScore()[0])
+              value=SATVerbal || (student.getBaseline().getScore().verbal || null))
 
         label(for="SATMath") /
         input(type="number"
               id="SATMath"
               name="SATMath"
               placeholder="Math"
-              value=SATMath || student.getBaseline().getScore().math)
-              //- value=SATMath || student.getBaseline().getScore()[1])
+              value=SATMath || (student.getBaseline().getScore().math || null))
 
       dd
         label(for="ACTEnglish") ACT: 
@@ -47,32 +45,28 @@ block main
               id="ACTEnglish"
               name="ACTEnglish"
               placeholder="English"
-              value=ACTEnglish || student.getBaseline().getScore().english)
-              //- value=ACTEnglish || student.getBaseline().getScore()[0])
+              value=ACTEnglish || (student.getBaseline().getScore().english || null))
 
         label(for="ACTMath") /
         input(type="number"
               id="ACTMath"
               name="ACTMath"
               placeholder="Math"
-              value=ACTMath || student.getBaseline().getScore().ACTMath)
-              //- value=ACTMath || student.getBaseline().getScore()[1])
+              value=ACTMath || (student.getBaseline().getScore().ACTMath || null))
 
         label(for="ACTReading") /
         input(type="number"
               id="ACTReading"
               name="ACTReading"
               placeholder="Reading"
-              value=ACTReading || student.getBaseline().getScore().reading)
-              //- value=ACTReading || student.getBaseline().getScore()[2])
+              value=ACTReading || (student.getBaseline().getScore().reading || null))
 
         label(for="ACTScience") /
         input(type="number"
               id="ACTScience"
               name="ACTScience"
               placeholder="Science"
-              value=ACTScience || student.getBaseline().getScore().science)
-              //- value=ACTScience || student.getBaseline().getScore()[3])
+              value=ACTScience || (student.getBaseline().getScore().science || null))
 
       br
       dt

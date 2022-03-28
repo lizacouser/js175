@@ -130,7 +130,7 @@ app.post("/students",
       }
 
       // eslint-disable-next-line max-len
-      let student = new Student(req.body.studentName, req.body.testPlan, baseline);
+      let student = new Student(req.body.studentName, req.body.testPlan);
       student.setBaseline(baseline);
       req.session.students.push(student);
       req.flash("success", "The student has been created.");
@@ -149,8 +149,55 @@ app.get("/students/:studentId", (req, res, next) => {
     res.render("student", {
       student: student,
       tests: sortTests(student.tests),
-      showAll: true,
     });
+  }
+});
+
+// Render edit todo list form
+app.get("/students/:studentId/edit", (req, res, next) => {
+  let studentId = req.params.studentId;
+  let student = loadStudent(+studentId, req.session.students);
+  if (!student) {
+    next(new Error("Not found."));
+  } else {
+    res.render("edit-list", { student });
+  }
+});
+
+app.get("/students/:studentId/tests/:testId/edit", (req, res, next) => {
+  let { studentId, testId } = { ...req.params };
+  let student = loadStudent(+studentId, req.session.students);
+
+  if (!student) {
+    next(new Error("Not found."));
+  } else {
+    let test = loadTest(+studentId, +testId, req.session.students);
+    if (!test) {
+      next(new Error("Not Found."));
+    } else {
+      res.render("edit-score", { student, test });
+    }
+  }
+});
+
+app.post("/students/:studentId/tests/:testId/clear", (req, res, next) => {
+  let { studentId, testId } = { ...req.params };
+  let student = loadStudent(+studentId, req.session.students);
+
+  if (!student) {
+    next(new Error("Not found."));
+  } else {
+    let test = loadTest(+studentId, +testId, req.session.students);
+    if (!test) {
+      next(new Error("Not Found."));
+    } else {
+      test.clearScore();
+      req.flash("success", `"${test.title}" score cleared!`);
+      res.render("student", { student,
+        tests: sortTests(student.tests),
+        flash: req.flash()}
+      );
+    }
   }
 });
 
@@ -181,14 +228,17 @@ app.post("/students/:studentId/tests/:testId/toggle",
           res.render("student", {
             student: student,
             tests: sortTests(student.tests),
-            showAll: true,
             flash: req.flash(),
           });
         } else {
           let title = test.title;
           if (test.isDone()) {
-            test.markUndone();
             test.clearScore();
+            test.markUndone();
+            // eslint-disable-next-line max-depth
+            if (student.baseline.name === test.name) {
+              student.clearBaseline();
+            }
             req.flash("success", `"${title}" marked as NOT done!`);
           } else {
             let score = test.isSAT() ? [
@@ -199,8 +249,63 @@ app.post("/students/:studentId/tests/:testId/toggle",
             ];
             test.setScore(score, req.body.projected, req.body.mock);
             test.markDone();
+            // eslint-disable-next-line max-depth
+            if (student.noBaseline()) {
+              student.baseline = test;
+            }
             req.flash("success", `"${title}" marked done.`);
           }
+          res.redirect(`/students/${studentId}`);
+        }
+      }
+    }
+  }
+);
+
+app.post("/students/:studentId/tests/:testId/edit",
+
+  [
+    validate.SATScore,
+    validate.ACTScore,
+  ],
+
+  // eslint-disable-next-line max-statements
+  (req, res, next) => {
+    let { studentId, testId } = { ...req.params };
+    let student = loadStudent(+studentId, req.session.students);
+
+    if (!student) {
+      next(new Error("Not found."));
+    } else {
+      let test = loadTest(+studentId, +testId, req.session.students);
+      if (!test) {
+        next(new Error("Not Found."));
+      } else {
+        let errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          errors.array().forEach(message => req.flash("error", message.msg));
+
+          res.render("edit-score", {
+            student, test,
+            flash: req.flash(),
+            SATVerbal: req.body.SATVerbal,
+            SATMath: req.body.SATMath,
+            ACTEnglish: req.body.ACTEnglish,
+            ACTMath: req.body.ACTMath,
+            ACTReading: req.body.ACTReading,
+            ACTScience: req.body.ACTScience,
+          });
+
+        } else {
+          let title = test.title;
+          let score = test.isSAT() ? [
+            +req.body.SATVerbal, +req.body.SATMath
+          ] : [
+            +req.body.ACTEnglish, +req.body.ACTMath,
+            +req.body.ACTReading, +req.body.ACTScience,
+          ];
+          test.setScore(score, req.body.projected, req.body.mock);
+          req.flash("success", `"${title}" score changed.`);
           res.redirect(`/students/${studentId}`);
         }
       }
@@ -249,22 +354,32 @@ app.post("/students/:studentId/show_all", (req, res, next) => {
     res.render("student", {
       student: student,
       tests: sortTests(student.tests),
-      showAll: true,
     });
   }
 });
 
-// show current tests only
-app.post("/students/:studentId/show_current", (req, res, next) => {
+// filter test display
+app.post("/students/:studentId/filter", (req, res, next) => {
   let studentId = req.params.studentId;
   let student = loadStudent(+studentId, req.session.students);
   if (!student) {
     next(new Error("Not found."));
   } else {
-    res.render("student", {
+    let filteredView = "student";
+    switch (req.body.filter) {
+      case "latest":
+        filteredView += "-latest";
+        break;
+      case "completed":
+        filteredView += "-completed";
+        break;
+      case "incomplete":
+        filteredView += "-incomplete";
+        break;
+    }
+    res.render(filteredView, {
       student: student,
       tests: sortTests(student.tests),
-      showAll: false,
     });
   }
 });
@@ -277,7 +392,7 @@ app.post("/students/:studentId/tests", (req, res, next) => {
     next(new Error("Not found."));
   } else {
     let testPacks = Test.PACK_ORDER[student.testPlan];
-    let nextIndex = testPacks.indexOf(student.currentTestPack) + 1;
+    let nextIndex = testPacks.indexOf(student.getLatestTestPack()) + 1;
 
     if (nextIndex < testPacks.length) {
       let nextPack = testPacks[nextIndex];
@@ -291,35 +406,49 @@ app.post("/students/:studentId/tests", (req, res, next) => {
 });
 
 // add test pack to student test list
+// app.post("/students/:studentId/remove_tests", (req, res, next) => {
+//   let studentId = req.params.studentId;
+//   let student = loadStudent(+studentId, req.session.students);
+//   if (!student) {
+//     next(new Error("Not found."));
+//   } else {
+//     let testPacks = Test.PACK_ORDER[student.testPlan];
+//     let latestIndex = testPacks.indexOf(student.latestTestPack);
+
+//     if (latestIndex > 0) {
+//       student.removeTestPack(student.latestTestPack);
+//       req.flash("success", "Test pack has been removed.");
+//     } else {
+//       req.flash("error", "Cannot remove first test pack in plan.");
+//     }
+//     res.redirect(`/students/${studentId}`);
+//   }
+// });
+
 app.post("/students/:studentId/remove_tests", (req, res, next) => {
   let studentId = req.params.studentId;
   let student = loadStudent(+studentId, req.session.students);
   if (!student) {
     next(new Error("Not found."));
   } else {
-    let testPacks = Test.PACK_ORDER[student.testPlan];
-    let currentIndex = testPacks.indexOf(student.currentTestPack);
+    let latest = student.getLatestTestPack();
+    let latestTests = student.tests.filter(test => {
+      return test.testPack === latest;
+    });
 
-    if (currentIndex > 0) {
-      student.removeTestPack(student.currentTestPack);
-      req.flash("success", "Test pack has been removed.");
+    if (latestTests.some(test => test.isDone())) {
+      req.flash("error", "Cannot remove completed test.");
+    } else if (student.size() === 0) {
+      req.flash("error", "No more test packs to remove.");
     } else {
-      req.flash("error", "Cannot remove first test pack in plan.");
+      // student.removeLatestTestPack();
+      student.removeTestPack(latest);
+      req.flash("success", "Test pack has been removed.");
     }
     res.redirect(`/students/${studentId}`);
   }
 });
 
-// Render edit todo list form
-app.get("/students/:studentId/edit", (req, res, next) => {
-  let studentId = req.params.studentId;
-  let student = loadStudent(+studentId, req.session.students);
-  if (!student) {
-    next(new Error("Not found."));
-  } else {
-    res.render("edit-list", { student });
-  }
-});
 
 // Delete todo list
 app.post("/students/:studentId/destroy", (req, res, next) => {

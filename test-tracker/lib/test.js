@@ -20,7 +20,6 @@ class Test {
 
   markDone() {
     this.done = true;
-    this.dateTaken = new Date();
   }
 
   setDateTaken(year, month, day) {
@@ -29,7 +28,6 @@ class Test {
 
   markUndone() {
     this.done = false;
-    this.dateTaken = null;
   }
 
   isDone() {
@@ -49,13 +47,17 @@ class Test {
   }
 
   clearScore() {
-    this.score = null;
-    this.isProjected = null;
-    this.mock = null;
+    this.setScore([]);
+    // this.isProjected = null;
+    // this.mock = null;
   }
 
   getScore() {
     return this.score;
+  }
+
+  noScore() {
+    return this.score.isEmpty();
   }
 
   getTitle() {
@@ -67,16 +69,14 @@ class Test {
   }
 
   toString() {
-    return this.getScore.toString();
+    return this.score.toString();
   }
 
   static makeTest(rawTest) {
     let test = Object.assign(new Test(), rawTest);
     if (rawTest.score && test.isACT()) {
-      console.log("\n\ntrue", test.title);
       test.score = ACTScore.makeACTScore(rawTest.score);
     } else if (rawTest.score && test.isSAT()) {
-      console.log("\n\ntruetrue", test.title);
       test.score = SATScore.makeSATScore(rawTest.score);
     }
     return test;

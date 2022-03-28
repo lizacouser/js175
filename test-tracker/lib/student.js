@@ -12,6 +12,14 @@ class Student {
 
   setTestPlan(plan) {
     this.testPlan = plan;
+
+    if (this.tests.every(test => {
+      return test.plan !== plan;
+    })) {
+      this.addTestPack(plan, Test.PACK_ORDER[plan][0]);
+    }
+
+    this.reorderTestsByPlan(plan);
   }
 
   createFirstPack(plan) {
@@ -29,17 +37,37 @@ class Student {
       this.tests.push(new Test(testName, plan, packName));
     });
 
-    this.currentTestPack = packName;
+    // this.latestTestPack = packName;
   }
+
+  reorderTestsByPlan(priorityTestPlan) {
+    let newPlan = this.tests.filter(test => test.plan === priorityTestPlan);
+    let oldPlan = this.tests.filter(test => test.plan !== priorityTestPlan);
+    this.tests = [].concat(newPlan, oldPlan);
+  }
+
+  getLatestTestPack() {
+    if (this.last()) {
+      return this.last().testPack;
+    } else {
+      return null;
+    }
+  }
+
+  // removeLatestTestPack() {
+  //   let latest = this.getLatestTestPack();
+
+  //   this.tests = this.tests.filter(test => {
+  //     return test.testPack !== latest;
+  //   });
+  // }
 
   removeTestPack(packName) {
-    let testList = Test.PACKS[packName];
-
-    testList.forEach(testName => {
-      this.tests.splice(this.tests.indexOf(testName), 1);
+    this.tests = this.tests.filter(test => {
+      return test.testPack !== packName;
     });
-    this.currentTestPack = this.last().testPack;
   }
+
 
   add(test) {
     if (!(test instanceof Test)) {
@@ -84,6 +112,10 @@ class Student {
     return this.size() > 0 && this.tests.every(test => test.isDone());
   }
 
+  hasNotBegun() {
+    return this.size() > 0 && this.tests.every(test => !test.isDone());
+  }
+
   shift() {
     return this.tests.shift();
   }
@@ -108,7 +140,7 @@ class Student {
   }
 
   filter(callback) {
-    let newStudent = new Student(this.name, this.testPlan/*, this.baseline*/);
+    let newStudent = new Student(this.name, this.testPlan);
     this.tests.forEach(test => {
       if (callback(test)) {
         newStudent.add(test);
@@ -151,7 +183,10 @@ class Student {
   }
 
   markAllDone() {
-    this.tests.forEach(test => test.markDone());
+    this.tests.forEach(test => {
+      test.markDone();
+      test.setScore([]);
+    });
   }
 
   markAllUndone() {
@@ -177,7 +212,19 @@ class Student {
     } else if (baselineScore.length === 4) {
       this.baseline = new Test("Baseline", "ACT");
       this.baseline.setScore(baselineScore);
+    } else {
+      this.baseline = new Test("Baseline", this.testPlan);
+      this.baseline.setScore(baselineScore);
     }
+  }
+
+  clearBaseline() {
+    this.baseline = new Test("Baseline", this.testPlan);
+    this.baseline.setScore([]);
+  }
+
+  noBaseline() {
+    return !!this.baseline || this.baseline.noScore();
   }
 
   static makeStudent(rawStudent) {
@@ -186,7 +233,7 @@ class Student {
       id: rawStudent.id,
       tests: [],
       baseline: Test.makeTest(rawStudent.baseline),
-      currentTestPack: rawStudent.currentTestPack,
+      latestTestPack: rawStudent.latestTestPack,
     });
     if (rawStudent.tests) {
       rawStudent.tests.forEach(test => student.add(Test.makeTest(test)));

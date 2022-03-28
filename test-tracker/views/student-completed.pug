@@ -1,0 +1,18 @@
+extends student
+
+block testDisplay
+  if student.hasNotBegun()
+    p Student has not completed any tests yet.
+  else
+    each test in tests
+      if test.isDone()
+        li(class="done")
+          h3= test.title
+          p= test.getScore().toString()
+          form(action=`/students/${student.id}/tests/${test.id}/edit` method="get")
+            button Edit Score
+          form.check(action=`/students/${student.id}/tests/${test.id}/toggle` method="post")
+            input(type="hidden" name="done" value=!test.isDone())
+            button Done
+          br
+          br
