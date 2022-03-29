@@ -2,7 +2,7 @@ extends student
 
 block testDisplay
   each test in tests
-    if student.getLatestTestPack() === test.testPack
+    if student.getCurrentTestPackName() === test.testPack
       li(class=test.isDone() ? "done" : "")
         h3= test.title
         if test.isDone()

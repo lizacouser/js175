@@ -11,9 +11,15 @@ block main
             a(href=`/students/${student.id}`)
               h2= student.name
             p #{student.allDone().length} / #{student.size()} completed
-            //- - let recentTest = student.mostRecentCompleted()
-            //- if !!recentTest && !!recentTest.getScore()
-            //-   p #{recentTest.getTitle()}: #{recentTest.getScore().toString()}
+            p Test Plan: #{student.testPlan}
+
+            if student.recentMock()
+              p #{student.recentMock().getScore().toString()}
+            else
+              - let highestTest = student.highestScoringTest()
+              if !!highestTest && !highestTest.noScore()
+                p Highest: #{highestTest.getScore().toString()}
+
             p Baseline: #{student.baseline.getScore().toString()}
 
             form.delete(action=`/students/${student.id}/destroy` method="post")

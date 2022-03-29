@@ -37,7 +37,7 @@ class Student {
       this.tests.push(new Test(testName, plan, packName));
     });
 
-    // this.latestTestPack = packName;
+    this.reorderTestsByPlan(plan);
   }
 
   reorderTestsByPlan(priorityTestPlan) {
@@ -46,26 +46,62 @@ class Student {
     this.tests = [].concat(newPlan, oldPlan);
   }
 
-  getLatestTestPack() {
-    if (this.last()) {
-      return this.last().testPack;
-    } else {
-      return null;
+  getNextTestPackName() {
+    let testPacks = Test.PACK_ORDER[this.testPlan];
+    for (let index = 0; index < testPacks.length; index += 1) {
+      if (!this.tests.some(test => {
+        return test.testPack === testPacks[index];
+      })) {
+        return testPacks[index];
+      }
     }
+    return null;
   }
 
-  // removeLatestTestPack() {
-  //   let latest = this.getLatestTestPack();
+  getCurrentTestPackName() {
+    let nextTest = this.tests.find(test => !test.isDone());
 
-  //   this.tests = this.tests.filter(test => {
-  //     return test.testPack !== latest;
-  //   });
-  // }
+    return nextTest.testPack;
+  }
+
+  getTestPack(packName) {
+    return this.tests.filter(test => {
+      return test.testPack === packName;
+    });
+  }
 
   removeTestPack(packName) {
     this.tests = this.tests.filter(test => {
       return test.testPack !== packName;
     });
+  }
+
+  getTestPackNames() {
+    let testPacks = [];
+
+    this.tests.forEach(test => {
+      if (!testPacks.includes(test.testPack)) {
+        testPacks.push(test.testPack);
+      }
+    });
+
+    return testPacks;
+  }
+
+  getRemoveableTestPackName() {
+    let packs = this.getTestPackNames();
+    let removeablePack;
+
+    for (let index = (packs.length - 1); index >= 0; index -= 1) {
+      let packName = packs[index];
+      removeablePack = this.getTestPack(packName);
+
+      if (removeablePack.every(test => !test.isDone())) {
+        return packName;
+      }
+    }
+
+    return null;
   }
 
 
@@ -77,10 +113,24 @@ class Student {
     this.tests.push(test);
   }
 
-  mostRecentCompleted() {
-    return this.allDone().sort((testA, testB) => {
-      return testB.dateTaken - testA.dateTaken;
+  // mostRecentCompleted() {
+  //   return this.allDone().sort((testA, testB) => {
+  //     return testB.dateTaken - testA.dateTaken;
+  //   })[0];
+  // }
+
+  highestScoringTest() {
+    let highScoreTest = this.allDone().sort((testA, testB) => {
+      return testB.getCumulativeScore() - testA.getCumulativeScore();
     })[0];
+
+    return highScoreTest;
+  }
+
+  recentMock() {
+    return this.allDone().find(test => {
+      return test.getScore().isMock();
+    });
   }
 
   size() {
@@ -224,7 +274,7 @@ class Student {
   }
 
   noBaseline() {
-    return !!this.baseline || this.baseline.noScore();
+    return !this.baseline || this.baseline.noScore();
   }
 
   static makeStudent(rawStudent) {
@@ -233,7 +283,6 @@ class Student {
       id: rawStudent.id,
       tests: [],
       baseline: Test.makeTest(rawStudent.baseline),
-      latestTestPack: rawStudent.latestTestPack,
     });
     if (rawStudent.tests) {
       rawStudent.tests.forEach(test => student.add(Test.makeTest(test)));

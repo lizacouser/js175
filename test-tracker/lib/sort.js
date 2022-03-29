@@ -17,7 +17,11 @@ module.exports = {
     return students.filter(student => student.name).sort(compareByTitle);
   },
 
-  sortTests(tests) {
+  sortTests(tests, plan) {
+    let newPlan = tests.filter(test => test.plan === plan);
+    let oldPlan = tests.filter(test => test.plan !== plan);
+    tests = [].concat(newPlan, oldPlan);
+
     let done = tests.filter(test => test.isDone());
     let undone = tests.filter(test => !test.isDone());
     return [].concat(undone, done);

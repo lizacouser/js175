@@ -62,9 +62,17 @@ block main
                 placeholder="Science"
                 value=ACTScience || (test.getScore().science || null))
       dd
-        input(type="checkbox" id="projected" name="projected" value="Projected")
+        input(type="checkbox"
+              id="projected"
+              name="projected"
+              value="Projected"
+              checked=test.getScore().isProjected())
         label(for="projected") Projected 
-        input(type="checkbox" id="mock" name="mock" value="Mock")
+        input(type="checkbox"
+              id="mock"
+              name="mock"
+              value="Mock"
+              checked=test.getScore().isMock())
         label(for="mock") Mock
 
       br

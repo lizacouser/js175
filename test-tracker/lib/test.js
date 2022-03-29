@@ -65,7 +65,8 @@ class Test {
   }
 
   getCumulativeScore() {
-    return this.score.getCumulativeScore();
+    let numSections = this.plan === "SAT" ? 2 : 4;
+    return this.score.getCumulativeScore(numSections) || null;
   }
 
   toString() {

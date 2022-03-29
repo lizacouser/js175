@@ -3,9 +3,9 @@ const express = require("express");
 const morgan = require("morgan");
 const flash = require("express-flash");
 const session = require("express-session");
-const { body, validationResult } = require("express-validator");
+const { /*body, */validationResult } = require("express-validator");
 const Student = require("./lib/student");
-const Test = require("./lib/test");
+// const Test = require("./lib/test");
 const { sortStudents, sortTests } = require("./lib/sort");
 const store = require("connect-loki");
 const validate = require("./lib/validator");
@@ -57,6 +57,16 @@ app.use((req, res, next) => {
   next();
 });
 
+// Extract session info
+app.use((req, _res, next) => {
+  let studentView = "student";
+  if ("studentView" in req.session) {
+    studentView = req.session.studentView;
+  }
+  req.session.studentView = studentView;
+  next();
+});
+
 
 const loadStudent = (studentId, students) => {
   return students.find(student => student.id === studentId);
@@ -78,6 +88,8 @@ app.get("/", (_req, res) => {
 
 // Render the list of todo lists
 app.get("/students", (req, res) => {
+  req.session.studentView = "student";
+
   res.render("students", {
     students: sortStudents(req.session.students),
   });
@@ -146,9 +158,9 @@ app.get("/students/:studentId", (req, res, next) => {
   if (student === undefined) {
     next(new Error("Not found."));
   } else {
-    res.render("student", {
+    res.render(req.session.studentView, {
       student: student,
-      tests: sortTests(student.tests),
+      tests: sortTests(student.tests, student.testPlan),
     });
   }
 });
@@ -160,7 +172,7 @@ app.get("/students/:studentId/edit", (req, res, next) => {
   if (!student) {
     next(new Error("Not found."));
   } else {
-    res.render("edit-list", { student });
+    res.render("edit-student", { student });
   }
 });
 
@@ -194,7 +206,7 @@ app.post("/students/:studentId/tests/:testId/clear", (req, res, next) => {
       test.clearScore();
       req.flash("success", `"${test.title}" score cleared!`);
       res.render("student", { student,
-        tests: sortTests(student.tests),
+        tests: sortTests(student.tests, student.testPlan),
         flash: req.flash()}
       );
     }
@@ -227,7 +239,7 @@ app.post("/students/:studentId/tests/:testId/toggle",
 
           res.render("student", {
             student: student,
-            tests: sortTests(student.tests),
+            tests: sortTests(student.tests, student.testPlan),
             flash: req.flash(),
           });
         } else {
@@ -344,6 +356,19 @@ app.post("/students/:studentId/complete_all", (req, res, next) => {
   }
 });
 
+// Uncheck all todos
+app.post("/students/:studentId/uncheck_all", (req, res, next) => {
+  let studentId = req.params.studentId;
+  let student = loadStudent(+studentId, req.session.students);
+  if (!student) {
+    next(new Error("Not found."));
+  } else {
+    student.markAllUndone();
+    req.flash("success", "All tests have been marked incomplete.");
+    res.redirect(`/students/${studentId}`);
+  }
+});
+
 // show all tests
 app.post("/students/:studentId/show_all", (req, res, next) => {
   let studentId = req.params.studentId;
@@ -353,7 +378,7 @@ app.post("/students/:studentId/show_all", (req, res, next) => {
   } else {
     res.render("student", {
       student: student,
-      tests: sortTests(student.tests),
+      tests: sortTests(student.tests, student.testPlan),
     });
   }
 });
@@ -367,8 +392,11 @@ app.post("/students/:studentId/filter", (req, res, next) => {
   } else {
     let filteredView = "student";
     switch (req.body.filter) {
-      case "latest":
-        filteredView += "-latest";
+      case "current":
+        filteredView += "-current";
+        break;
+      case "plan":
+        filteredView += "-plan";
         break;
       case "completed":
         filteredView += "-completed";
@@ -377,25 +405,24 @@ app.post("/students/:studentId/filter", (req, res, next) => {
         filteredView += "-incomplete";
         break;
     }
-    res.render(filteredView, {
+    req.session.studentView = filteredView;
+
+    res.render(req.session.studentView, {
       student: student,
-      tests: sortTests(student.tests),
+      tests: sortTests(student.tests, student.testPlan),
     });
   }
 });
 
-// add test pack to student test list
 app.post("/students/:studentId/tests", (req, res, next) => {
   let studentId = req.params.studentId;
   let student = loadStudent(+studentId, req.session.students);
   if (!student) {
     next(new Error("Not found."));
   } else {
-    let testPacks = Test.PACK_ORDER[student.testPlan];
-    let nextIndex = testPacks.indexOf(student.getLatestTestPack()) + 1;
+    let nextPack = student.getNextTestPackName();
 
-    if (nextIndex < testPacks.length) {
-      let nextPack = testPacks[nextIndex];
+    if (nextPack) {
       student.addTestPack(student.testPlan, nextPack);
       req.flash("success", "Test pack has been added.");
     } else {
@@ -405,50 +432,18 @@ app.post("/students/:studentId/tests", (req, res, next) => {
   }
 });
 
-// add test pack to student test list
-// app.post("/students/:studentId/remove_tests", (req, res, next) => {
-//   let studentId = req.params.studentId;
-//   let student = loadStudent(+studentId, req.session.students);
-//   if (!student) {
-//     next(new Error("Not found."));
-//   } else {
-//     let testPacks = Test.PACK_ORDER[student.testPlan];
-//     let latestIndex = testPacks.indexOf(student.latestTestPack);
-
-//     if (latestIndex > 0) {
-//       student.removeTestPack(student.latestTestPack);
-//       req.flash("success", "Test pack has been removed.");
-//     } else {
-//       req.flash("error", "Cannot remove first test pack in plan.");
-//     }
-//     res.redirect(`/students/${studentId}`);
-//   }
-// });
-
 app.post("/students/:studentId/remove_tests", (req, res, next) => {
   let studentId = req.params.studentId;
   let student = loadStudent(+studentId, req.session.students);
   if (!student) {
     next(new Error("Not found."));
   } else {
-    let latest = student.getLatestTestPack();
-    let latestTests = student.tests.filter(test => {
-      return test.testPack === latest;
-    });
-
-    if (latestTests.some(test => test.isDone())) {
-      req.flash("error", "Cannot remove completed test.");
-    } else if (student.size() === 0) {
-      req.flash("error", "No more test packs to remove.");
-    } else {
-      // student.removeLatestTestPack();
-      student.removeTestPack(latest);
-      req.flash("success", "Test pack has been removed.");
-    }
+    let removeablePack = student.getRemoveableTestPackName();
+    student.removeTestPack(removeablePack);
+    req.flash("success", "Test pack has been removed.");
     res.redirect(`/students/${studentId}`);
   }
 });
-
 
 // Delete todo list
 app.post("/students/:studentId/destroy", (req, res, next) => {
@@ -484,7 +479,7 @@ app.post("/students/:studentId/edit",
       if (!errors.isEmpty()) {
         errors.array().forEach(message => req.flash("error", message.msg));
 
-        res.render("edit-list", {flash: req.flash(), studentName: req.body.studentName, student: student, SATVerbal: req.body.SATVerbal, SATMath: req.body.SATMath});
+        res.render("edit-student", {flash: req.flash(), studentName: req.body.studentName, student: student, SATVerbal: req.body.SATVerbal, SATMath: req.body.SATMath});
       } else {
         let baseline = [];
         if (req.body.SATVerbal && req.body.SATMath) {
